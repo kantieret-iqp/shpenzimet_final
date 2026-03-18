@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shpenzimet Familjare</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#2D6A4F;--g2:#40916C;--g3:#74C69D;
+  --si:#264653;--dark:#1b2e25;
+  --warn:#F4A261;--danger:#E76F51;
+  --bg:#f0f4f1;--card:#fff;--bd:#dde8e2;
+  --t1:#111;--t2:#4a5e54;--t3:#8fa899;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px}
+
+/* ── SCREENS ─────────────────────────── */
+.screen{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:16px}
+.screen.gone{display:none!important}
+.sbox{background:#fff;border-radius:18px;padding:32px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+
+/* SETUP */
+#sc-setup{background:var(--si)}
+#sc-setup .sbox{max-width:500px}
+.slogo{text-align:center;font-size:48px;margin-bottom:8px}
+.stit{text-align:center;font-size:21px;font-weight:800;color:var(--si);margin-bottom:4px}
+.ssub{text-align:center;font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.6}
+.sstep{display:flex;gap:12px;background:#f4faf6;border:1px solid #c8e6d3;border-radius:11px;padding:13px 15px;margin-bottom:10px;font-size:13px;color:var(--t2);line-height:1.7}
+.sstep strong{color:var(--t1)}.sstep a{color:var(--g1);font-weight:700;text-decoration:none}
+.snum{width:28px;height:28px;border-radius:50%;background:var(--g1);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.sf{width:100%;padding:10px 13px;border:1.5px solid var(--bd);border-radius:9px;font-size:14px;font-family:inherit;outline:none;transition:border .15s;margin-bottom:10px;color:var(--t1);background:#fff}
+.sf:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(64,145,108,.12)}
+.sf::placeholder{color:#bbb}
+.sbtn{width:100%;padding:13px;background:var(--g1);border:none;border-radius:11px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.sbtn:hover:not(:disabled){background:var(--g2);transform:translateY(-1px)}
+.sbtn:disabled{background:#aaa;cursor:not-allowed;transform:none}
+.scopy{display:inline-flex;align-items:center;gap:6px;background:var(--g1);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;font-family:inherit}
+.scopy:hover{background:var(--g2)}
+.serr{display:none;background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:10px 13px;font-size:13px;color:#c0392b;margin-top:10px;line-height:1.6}
+.sok{display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 13px;font-size:13px;color:#166534;margin-top:10px}
+
+/* LOGIN */
+#sc-login{background:linear-gradient(135deg,var(--si) 0%,#1a3a2a 100%)}
+#sc-login .sbox{max-width:380px;text-align:center}
+.login-logo{font-size:52px;margin-bottom:12px}
+.login-tit{font-size:22px;font-weight:800;color:var(--si);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--t2);margin-bottom:24px}
+.login-tabs{display:flex;border:1.5px solid var(--bd);border-radius:9px;overflow:hidden;margin-bottom:18px}
+.ltab{flex:1;padding:9px;font-size:13px;cursor:pointer;background:#fff;border:none;font-family:inherit;font-weight:500;color:var(--t2);text-align:center;transition:all .15s}
+.ltab.act{background:var(--g1);color:#fff;font-weight:700}
+.lbtn{width:100%;padding:12px;background:var(--g1);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:6px;transition:all .2s}
+.lbtn:hover{background:var(--g2)}
+.lerr{color:#c0392b;font-size:12px;margin-top:9px;text-align:center;display:none}
+.lmsg{color:var(--g1);font-size:12px;margin-top:9px;text-align:center;display:none}
+
+/* ── APP ─────────────────────────────── */
+#app{display:none;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
+#app.show{display:grid}
+.hdr{background:var(--si);color:#fff;display:flex;align-items:center;padding:0 14px;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.hlogo{width:30px;height:30px;background:var(--g3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.htit{font-size:15px;font-weight:700;white-space:nowrap}
+.hright{margin-left:auto;display:flex;gap:6px;align-items:center}
+.psel{display:flex;border:1px solid rgba(255,255,255,.25);border-radius:7px;overflow:hidden}
+.pb{padding:5px 11px;font-size:11px;cursor:pointer;background:transparent;border:none;color:rgba(255,255,255,.65);font-family:inherit;font-weight:500;transition:all .15s}
+.pb:hover{color:#fff;background:rgba(255,255,255,.12)}
+.pb.act{background:rgba(255,255,255,.22);color:#fff;font-weight:700}
+.ubadge{background:rgba(255,255,255,.12);border-radius:20px;padding:3px 11px;font-size:12px;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.18);cursor:pointer}
+.ubadge:hover{background:rgba(255,255,255,.2)}
+.udot{width:7px;height:7px;border-radius:50%;background:var(--g3)}
+.hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s}
+.hbtn:hover{background:rgba(255,255,255,.22)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:#fff;font-size:22px;padding:2px 4px;line-height:1}
+.admin-badge{background:rgba(251,191,36,.25);border:1px solid rgba(251,191,36,.5);border-radius:20px;padding:2px 9px;font-size:11px;color:#fde68a;font-weight:700}
+.sync-badge{display:flex;align-items:center;gap:4px;font-size:11px;color:rgba(255,255,255,.7)}
+.sdot{width:7px;height:7px;border-radius:50%;background:#4ade80;transition:background .3s}
+.sdot.busy{background:#fbbf24;animation:pulse .8s infinite}
+.sdot.err{background:#f87171}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.mob-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:48}
+.mob-ov.show{display:block}
+.fab{display:none;position:fixed;bottom:20px;right:18px;width:52px;height:52px;border-radius:50%;background:var(--g1);border:none;color:#fff;font-size:27px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:39;align-items:center;justify-content:center}
+
+/* ── LAYOUT ─────────────────────────── */
+.main{display:grid;grid-template-columns:196px 1fr;overflow:hidden;min-height:0}
+.sb{background:var(--card);border-right:1px solid var(--bd);padding:8px 0;overflow-y:auto}
+.nsec{font-size:10px;font-weight:700;color:var(--t3);padding:14px 14px 4px;letter-spacing:.9px;text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:13px;cursor:pointer;color:var(--t2);border-left:3px solid transparent;transition:all .12s;user-select:none}
+.ni:hover{background:#f2f8f4;color:var(--t1)}
+.ni.act{background:#edf7f1;color:var(--g1);border-left-color:var(--g1);font-weight:600}
+.ni.adm-only{opacity:.5;pointer-events:none}
+.ni.adm-only.visible{opacity:1;pointer-events:all}
+.nic{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.cnt{overflow-y:auto;padding:18px;background:var(--bg)}
+.pg{display:none}.pg.act{display:block}
+.ptit{font-size:19px;font-weight:800;margin-bottom:14px}
+
+/* ── GRID/CARDS ─────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:15px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.ctit{font-size:13px;font-weight:700;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px}
+.met{background:#f4faf6;border:1px solid #c8e6d3;border-radius:9px;padding:12px}
+.ml{font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.mv{font-size:21px;font-weight:800}
+.ms{font-size:11px;color:var(--t3);margin-top:2px}
+.met.gr .mv{color:var(--g1)}.met.or .mv{color:#b96a1f}.met.rd .mv{color:#c0392b}
+
+/* ── BUTTONS ────────────────────────── */
+.btn{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--t1);font-family:inherit;transition:all .12s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:hover{background:#f2f8f4;border-color:#b5d5c4}
+.btnp{background:var(--g1);border-color:var(--g1);color:#fff;font-weight:600}
+.btnp:hover{background:var(--g2)}
+.btnd{border-color:#fca5a5;color:#c0392b}
+.btnd:hover{background:#fef2f2}
+.btnsm{padding:4px 9px;font-size:12px}
+.btnxs{padding:2px 7px;font-size:11px}
+
+/* ── TABLE ──────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--t2);border-bottom:1px solid var(--bd);background:#f9fbfa;text-transform:uppercase;letter-spacing:.4px}
+td{padding:9px 12px;border-bottom:1px solid var(--bd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9fbfa}
+
+/* ── MISC ───────────────────────────── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.pbar{height:5px;background:#dde8e2;border-radius:3px;overflow:hidden;margin-top:5px}
+.pfill{height:100%;border-radius:3px;background:var(--g2);transition:width .4s}
+.pfill.warn{background:var(--warn)}.pfill.danger{background:var(--danger)}
+.crow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd)}
+.crow:last-child{border-bottom:none}
+.bars{display:flex;flex-direction:column;gap:6px}
+.brow{display:flex;align-items:center;gap:8px;font-size:12px}
+.blbl{width:82px;text-align:right;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.btrk{flex:1;height:20px;background:#e8f2ed;border-radius:4px;overflow:hidden}
+.bfil{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:7px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden}
+.bval{width:70px;text-align:right;color:var(--t2);flex-shrink:0}
+.fbtn{padding:4px 11px;border-radius:20px;font-size:12px;border:1px solid var(--bd);cursor:pointer;background:var(--card);color:var(--t2);font-family:inherit;transition:all .12s;font-weight:500}
+.fbtn:hover,.fbtn.act{background:var(--g1);border-color:var(--g1);color:#fff;font-weight:600}
+.gre{color:var(--g1);font-weight:700}.red{color:#c0392b;font-weight:700}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:14px;overflow-x:auto}
+.tab{padding:8px 13px;font-size:13px;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;transition:all .12s;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;font-weight:500;white-space:nowrap}
+.tab.act{color:var(--g1);border-bottom-color:var(--g1);font-weight:700}
+.al{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:8px;font-size:13px;margin-bottom:8px;line-height:1.5}
+.al.w{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.al.e{background:#fff0f0;border:1px solid #fca5a5;color:#c0392b}
+.al.s{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.mpstrip{display:none;gap:5px;margin-bottom:12px}
+.mpb{flex:1;padding:7px 4px;font-size:12px;cursor:pointer;background:var(--card);border:1px solid var(--bd);color:var(--t2);font-family:inherit;border-radius:7px;text-align:center;transition:all .12s}
+.mpb.act{background:var(--g1);border-color:var(--g1);color:#fff;font-weight:700}
+.ucard{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--bd);border-radius:10px;background:#fff;margin-bottom:8px}
+.uav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+
+/* ── MODALS ─────────────────────────── */
+.mover{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .18s;padding:10px}
+.mover.show{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:14px;padding:22px;width:430px;max-width:100%;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.96);transition:transform .18s;max-height:90vh;overflow-y:auto}
+.mover.show .modal{transform:scale(1)}
+.mtit{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.xcbtn{background:#f0f4f1;border:none;cursor:pointer;font-size:15px;color:var(--t2);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.xcbtn:hover{background:#dde8e2}
+.fg{margin-bottom:11px}
+.fl{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:5px;display:block}
+.fi{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:var(--t1);outline:none;transition:border .12s}
+.fi:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(64,145,108,.1)}
+.atabs{display:flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.atab{flex:1;padding:8px;font-size:13px;cursor:pointer;background:#fff;border:none;font-family:inherit;font-weight:500;color:var(--t2);text-align:center;transition:all .12s}
+.atab.act{background:var(--g1);color:#fff;font-weight:700}
+.art-row{display:flex;align-items:center;gap:8px;background:#f4faf6;border:1px solid #c8e6d3;border-radius:8px;padding:7px 10px;margin-bottom:5px}
+.art-del{background:none;border:none;cursor:pointer;color:#c0392b;font-size:18px;padding:0 2px;line-height:1;flex-shrink:0}
+.add-art-box{background:#f4faf6;border:1px solid #c8e6d3;border-radius:9px;padding:12px;margin-bottom:10px}
+.ico-opt{cursor:pointer;font-size:19px;padding:4px;border-radius:6px;border:2px solid transparent;display:inline-block;transition:all .12s}
+.ico-opt:hover,.ico-opt.sel{border-color:var(--g2);background:#e8f5ec}
+.col-opt{cursor:pointer;width:26px;height:26px;border-radius:6px;border:3px solid transparent;display:inline-block;transition:all .12s}
+.col-opt:hover,.col-opt.sel{border-color:var(--g1);transform:scale(1.1)}
+.avcol{cursor:pointer;width:26px;height:26px;border-radius:50%;border:3px solid transparent;display:inline-block;transition:all .12s}
+.avcol:hover,.avcol.sel{border-color:#fff;box-shadow:0 0 0 2px var(--g1)}
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:12px}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--dark);color:#fff;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:600;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--g1)}.toast.err{background:#c0392b}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .65s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.phead{display:none;text-align:center;padding-bottom:16px;border-bottom:2px solid var(--g1);margin-bottom:16px}
+.phead h2{font-size:17px;font-weight:800;color:var(--si)}.phead p{font-size:12px;color:var(--t2);margin-top:3px}
+.xlsa{border:2px dashed var(--bd);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .15s}
+.xlsa:hover{border-color:var(--g2);background:#f4faf6}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bd);transition:all .2s}
+.pin-dot.filled{background:var(--g1);border-color:var(--g1)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto}
+.pin-key{padding:14px;font-size:18px;font-weight:700;background:#f4faf6;border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;font-family:inherit;color:var(--t1);transition:all .12s;text-align:center}
+.pin-key:hover{background:var(--g1);color:#fff;border-color:var(--g1)}
+.pin-key.del{font-size:14px;color:var(--t2)}
+
+/* ── MOBILE ─────────────────────────── */
+@media(max-width:680px){
+  #app.show{grid-template-rows:48px 1fr}
+  .hdr{padding:0 10px;gap:7px}
+  .htit{font-size:14px}
+  .psel,.ubadge,.hright .btnp,.admin-badge{display:none}
+  .hamburger{display:flex;align-items:center;justify-content:center}
+  .main{grid-template-columns:1fr}
+  .sb{position:fixed;left:-206px;top:48px;bottom:0;width:200px;z-index:50;transition:left .22s;box-shadow:2px 0 14px rgba(0,0,0,.14)}
+  .sb.open{left:0}
+  .fab{display:flex}
+  .cnt{padding:12px}
+  .g4{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .hmob{display:none}
+  .mpstrip{display:flex}
+  table{font-size:12px}th,td{padding:6px 9px}
+  .modal{padding:16px}
+}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff!important}
+  #sc-setup,#sc-login,.hdr,.sb,.fab,.hamburger,.mob-ov,.mover,.mpstrip,.toast,
+  .btn,.fbtn,.tabs,.hright,.psel,.atabs{display:none!important}
+  #app.show{display:block!important;height:auto!important;overflow:visible!important}
+  .main{display:block!important}
+  .cnt{overflow:visible!important;padding:0!important;background:#fff!important}
+  .pg{display:none!important}.pg.pnow{display:block!important}
+  .phead{display:block!important}
+  .g4{grid-template-columns:repeat(4,1fr)!important}
+  .g2{grid-template-columns:1fr 1fr!important}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
+  .hmob{display:table-cell!important}
+  #rt-ov,#rt-mem,#rt-cat,#rt-det{display:block!important}
+  tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SETUP SCREEN ═══════════ -->
+<div id="sc-setup" class="screen">
+<div class="sbox">
+  <div class="slogo">🏠</div>
+  <div class="stit">Shpenzimet Familjare</div>
+  <div class="ssub">Konfiguro lidhjen me Google Sheets — vetëm 1 herë</div>
+
+  <div class="sstep">
+    <div class="snum">1</div>
+    <div>Shko tek <a href="https://sheets.new" target="_blank">sheets.new</a> → krijohet spreadsheet i ri automatikisht.</div>
+  </div>
+  <div class="sstep">
+    <div class="snum">2</div>
+    <div>
+      <strong>Extensions → Apps Script</strong> → fshij gjithçka → ngjit kodin → <strong>Ctrl+S</strong><br>
+      Pastaj: <strong>Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone → Deploy</strong><br>
+      Nëse shfaqet paralajmërim → <strong>Advanced → Go to app (unsafe) → Allow</strong><br>
+      Kopjo <strong>Web app URL</strong>.
+      <button class="scopy" onclick="copyCode()">📋 Kopjo Kodin Apps Script</button>
+    </div>
+  </div>
+  <div class="sstep">
+    <div class="snum">3</div>
+    <div>Ngjit URL-in dhe vendos fjalëkalimet. Gati!</div>
+  </div>
+
+  <label class="fl" style="margin-top:4px">Web App URL</label>
+  <input class="sf" id="s-url" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+
+  <label class="fl">👑 Fjalëkalimi i Adminit</label>
+  <input class="sf" id="s-apass" type="password" placeholder="Fjalëkalim për admin (p.sh. admin123)">
+
+  <label class="fl">👨‍👩‍👧 Fjalëkalimi Familjar</label>
+  <input class="sf" id="s-fpass" type="password" placeholder="Fjalëkalim për familjen (p.sh. familja2025)">
+
+  <button class="sbtn" id="s-btn" onclick="doSetup()">🚀 Konfiguro dhe Fillo!</button>
+  <div class="serr" id="s-err"></div>
+  <div class="sok" id="s-ok"></div>
+</div>
+</div>
+
+<!-- ═══════════ LOGIN SCREEN ═══════════ -->
+<div id="sc-login" class="screen gone">
+<div class="sbox">
+  <div class="login-logo">🏠</div>
+  <div class="login-tit">Shpenzimet Familjare</div>
+  <div class="login-sub">Hyr me fjalëkalimin tënd</div>
+
+  <div class="login-tabs">
+    <button class="ltab act" id="lt-fam" onclick="switchLoginTab('fam')">👨‍👩‍👧 Familja</button>
+    <button class="ltab" id="lt-adm" onclick="switchLoginTab('adm')">👑 Admin</button>
+  </div>
+
+  <!-- Family login -->
+  <div id="lf-fam">
+    <div class="fg"><label class="fl">Emri yt</label>
+      <input class="fi" id="l-name" placeholder="p.sh. Ana, Gent, Leka..." onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="fg"><label class="fl">Fjalëkalimi Familjar</label>
+      <input class="fi" id="l-fpass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="lbtn" onclick="doLogin()">→ Hyr</button>
+  </div>
+
+  <!-- Admin login -->
+  <div id="lf-adm" style="display:none">
+    <div class="fg"><label class="fl">Emri Adminit</label>
+      <input class="fi" id="l-aname" placeholder="Emri admin" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <div class="fg"><label class="fl">Fjalëkalimi i Adminit</label>
+      <input class="fi" id="l-apass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="lbtn" onclick="doAdminLogin()">→ Hyr si Admin</button>
+  </div>
+
+  <div class="lerr" id="l-err"></div>
+  <div class="lmsg" id="l-msg"></div>
+
+  <div style="margin-top:16px;text-align:center">
+    <button onclick="showSetup()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:inherit">⚙️ Rikonfiguro lidhjen</button>
+  </div>
+</div>
+</div>
+
+<!-- Apps Script code (hidden) -->
+<textarea id="as-code" style="display:none">
+var S_TX='Shpenzimet',S_CF='Config',S_MEM='Anetaret',S_CAT='Kategori';
+
+function doGet(e){
+  var a=(e&&e.parameter&&e.parameter.action)||'read';
+  var ss=SpreadsheetApp.getActiveSpreadsheet();
+  init(ss);
+  if(a==='ping')return J({ok:true});
+  if(a==='read')return J({ok:true,tx:getRows(ss,S_TX),cfg:getCfg(ss),mem:getRows(ss,S_MEM),cat:getRows(ss,S_CAT)});
+  return J({ok:false});
+}
+
+function doPost(e){
+  var ss=SpreadsheetApp.getActiveSpreadsheet();
+  init(ss);
+  var b=JSON.parse(e.postData.contents),a=b.action;
+  if(a==='addTx'){
+    var s=ss.getSheetByName(S_TX),id=Utilities.getUuid();
+    s.appendRow([id,b.desc,b.amount,b.cat,b.member,b.date,b.notes||'',JSON.stringify(b.items||[]),new Date().toISOString()]);
+    return J({ok:true,id:id});
+  }
+  if(a==='updateTx'){
+    var s=ss.getSheetByName(S_TX),d=s.getDataRange().getValues();
+    for(var i=1;i<d.length;i++){
+      if(d[i][0]===b.id){
+        s.getRange(i+1,2,1,7).setValues([[b.desc,b.amount,b.cat,b.member,b.date,b.notes||'',JSON.stringify(b.items||[])]]);
+        break;
+      }
+    }
+    return J({ok:true});
+  }
+  if(a==='deleteTx'){
+    var s=ss.getSheetByName(S_TX),d=s.getDataRange().getValues();
+    for(var i=1;i<d.length;i++){if(d[i][0]===b.id){s.deleteRow(i+1);break;}}
+    return J({ok:true});
+  }
+  if(a==='saveCfg'){
+    var s=ss.getSheetByName(S_CF);
+    s.clearContents();
+    s.appendRow(['key','value']);
+    s.appendRow(['budget',JSON.stringify(b.budget)]);
+    return J({ok:true});
+  }
+  if(a==='addMember'){
+    var s=ss.getSheetByName(S_MEM),d=s.getDataRange().getValues(),found=false;
+    for(var i=1;i<d.length;i++){
+      if(d[i][0]===b.id){s.getRange(i+1,1,1,4).setValues([[b.id,b.name,b.role,b.color]]);found=true;break;}
+    }
+    if(!found)s.appendRow([b.id,b.name,b.role,b.color]);
+    return J({ok:true});
+  }
+  if(a==='delMember'){
+    var s=ss.getSheetByName(S_MEM),d=s.getDataRange().getValues();
+    for(var i=1;i<d.length;i++){if(d[i][0]===b.id){s.deleteRow(i+1);break;}}
+    return J({ok:true});
+  }
+  if(a==='addCat'){
+    var s=ss.getSheetByName(S_CAT),d=s.getDataRange().getValues(),found=false;
+    for(var i=1;i<d.length;i++){
+      if(d[i][0]===b.id){s.getRange(i+1,1,1,5).setValues([[b.id,b.name,b.icon,b.color,b.tc]]);found=true;break;}
+    }
+    if(!found)s.appendRow([b.id,b.name,b.icon,b.color,b.tc]);
+    return J({ok:true});
+  }
+  if(a==='delCat'){
+    var s=ss.getSheetByName(S_CAT),d=s.getDataRange().getValues();
+    for(var i=1;i<d.length;i++){if(d[i][0]===b.id){s.deleteRow(i+1);break;}}
+    return J({ok:true});
+  }
+  return J({ok:false,error:'unknown'});
+}
+
+function getRows(ss,name){
+  var s=ss.getSheetByName(name);if(!s)return[];
+  var d=s.getDataRange().getValues();if(d.length<2)return[];
+  var h=d[0],out=[];
+  for(var i=1;i<d.length;i++){var r={};for(var j=0;j<h.length;j++)r[h[j]]=d[i][j];if(r.id)out.push(r);}
+  return out;
+}
+
+function getCfg(ss){
+  var s=ss.getSheetByName(S_CF);if(!s)return defCfg();
+  var d=s.getDataRange().getValues(),c={};
+  for(var i=1;i<d.length;i++){try{c[d[i][0]]=JSON.parse(d[i][1]);}catch(ex){}}
+  return c.budget?c:defCfg();
+}
+
+function defCfg(){
+  return{budget:{total:60000,byCat:{ushqim:15000,transport:8000,shtepi:12000,shendeti:5000,argetime:6000,arsim:7000,veshje:4000,tjera:3000}}};
+}
+
+function init(ss){
+  if(!ss.getSheetByName(S_TX)){
+    var s=ss.insertSheet(S_TX);
+    s.appendRow(['id','desc','amount','cat','member','date','notes','items','created_at']);
+    s.setFrozenRows(1);
+    s.getRange(1,1,1,9).setFontWeight('bold').setBackground('#2D6A4F').setFontColor('#ffffff');
+  }
+  if(!ss.getSheetByName(S_CF)){
+    var s=ss.insertSheet(S_CF);
+    s.appendRow(['key','value']);
+    s.appendRow(['budget',JSON.stringify(defCfg().budget)]);
+  }
+  if(!ss.getSheetByName(S_MEM)){
+    var s=ss.insertSheet(S_MEM);
+    s.appendRow(['id','name','role','color']);
+    s.setFrozenRows(1);
+    s.getRange(1,1,1,4).setFontWeight('bold').setBackground('#264653').setFontColor('#ffffff');
+  }
+  if(!ss.getSheetByName(S_CAT)){
+    var s=ss.insertSheet(S_CAT);
+    s.appendRow(['id','name','icon','color','tc']);
+    s.setFrozenRows(1);
+    s.getRange(1,1,1,5).setFontWeight('bold').setBackground('#264653').setFontColor('#ffffff');
+    var cats=[
+      ['ushqim','Ushqim','🛒','#fef9c3','#854d0e'],
+      ['transport','Transport','🚗','#dbeafe','#1e40af'],
+      ['shtepi','Shtepi','🏠','#dcfce7','#166534'],
+      ['shendeti','Shendeti','💊','#fce7f3','#9d174d'],
+      ['argetime','Argetim','🎮','#ede9fe','#5b21b6'],
+      ['arsim','Arsim','📚','#ffedd5','#9a3412'],
+      ['veshje','Veshje','👔','#f1f5f9','#334155'],
+      ['tjera','Tjera','📦','#f3f4f6','#374151']
+    ];
+    for(var i=0;i<cats.length;i++)s.appendRow(cats[i]);
+  }
+}
+
+function J(obj){
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+</textarea>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div id="app">
+<div class="hdr">
+  <button class="hamburger" onclick="toggleSB()">☰</button>
+  <div class="hlogo">🏠</div>
+  <div class="htit">Shpenzimet Familjare</div>
+  <div class="sync-badge"><div class="sdot" id="sdot"></div><span id="stxt">Live</span></div>
+  <div class="hright">
+    <span class="admin-badge" id="adm-badge" style="display:none">👑 Admin</span>
+    <div class="psel">
+      <button class="pb" onclick="setPer('ditor',this)">Ditor</button>
+      <button class="pb act" onclick="setPer('mujor',this)">Mujor</button>
+      <button class="pb" onclick="setPer('javor',this)">Javor</button>
+      <button class="pb" onclick="setPer('vjetor',this)">Vjetor</button>
+    </div>
+    <div class="ubadge" onclick="goTo('anetaret')"><div class="udot"></div><span id="ulbl">—</span></div>
+    <button class="btn btnp btnsm hbtn" onclick="openAdd()">+ Shto</button>
+    <button class="hbtn" onclick="loadAll(true)">🔄</button>
+    <button class="hbtn" onclick="doLogout()" title="Dil">⏻</button>
+  </div>
+</div>
+<div class="mob-ov" id="mob-ov" onclick="toggleSB()"></div>
+<button class="fab" onclick="openAdd()">+</button>
+<div class="main">
+<div class="sb" id="sb">
+  <div class="nsec">Kryesore</div>
+  <div class="ni act" onclick="goTo('dashboard')"><span class="nic">📊</span>Pasqyra</div>
+  <div class="ni" onclick="goTo('shpenzimet')"><span class="nic">💳</span>Shpenzimet</div>
+  <div class="ni" onclick="goTo('buxheti')"><span class="nic">🎯</span>Buxheti</div>
+  <div class="nsec">Analiza</div>
+  <div class="ni" onclick="goTo('raportet')"><span class="nic">📈</span>Raportet</div>
+  <div class="ni adm-only" id="ni-kat" onclick="goTo('kategorite')"><span class="nic">🗂️</span>Kategoritë</div>
+  <div class="nsec">Familja</div>
+  <div class="ni adm-only" id="ni-mem" onclick="goTo('anetaret')"><span class="nic">👥</span>Anëtarët</div>
+  <div class="ni" onclick="goTo('eksporto')"><span class="nic">📁</span>Eksporto</div>
+</div>
+<div class="cnt">
+
+<!-- DASHBOARD -->
+<div class="pg act" id="pg-dashboard">
+  <div class="phead" id="ph-d"><h2>🏠 Shpenzimet Familjare</h2><p id="ph-d-p"></p></div>
+  <div class="mpstrip" id="mps">
+    <button class="mpb" onclick="setPer('ditor',this)">Ditor</button>
+    <button class="mpb act" onclick="setPer('mujor',this)">Mujor</button>
+    <button class="mpb" onclick="setPer('javor',this)">Javor</button>
+    <button class="mpb" onclick="setPer('vjetor',this)">Vjetor</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap">
+    <div class="ptit" style="margin:0">📊 Pasqyra</div>
+    <span id="d-badge" style="font-size:12px;background:#edf7f1;border:1px solid #86efac;border-radius:20px;padding:2px 10px;color:var(--g1);font-weight:600">—</span>
+    <button class="btn btnsm" onclick="printPg('dashboard')" style="margin-left:auto;border-color:var(--g1);color:var(--g1)">🖨️ PDF</button>
+  </div>
+  <div class="g4">
+    <div class="met gr"><div class="ml">Total Shpenzuar</div><div class="mv" id="d-tot">—</div><div class="ms">Buxheti: <span id="d-bud">—</span></div></div>
+    <div class="met"><div class="ml">Mbetur</div><div class="mv" id="d-rem">—</div><div class="ms" id="d-rems">nga buxheti</div></div>
+    <div class="met or"><div class="ml">Mesatare / Ditë</div><div class="mv" id="d-avg">—</div></div>
+    <div class="met"><div class="ml">Transaksione</div><div class="mv" id="d-cnt" style="color:var(--si)">0</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctit">Sipas Kategorisë</div><div id="d-cats"></div></div>
+    <div class="card"><div class="ctit">Të Fundit <button class="btn btnsm" onclick="goTo('shpenzimet')">→</button></div><div id="d-recent"></div></div>
+  </div>
+  <div class="card"><div class="ctit">Sipas Anëtarit</div><div id="d-membar" class="bars"></div></div>
+</div>
+
+<!-- SHPENZIMET -->
+<div class="pg" id="pg-shpenzimet">
+  <div class="phead" id="ph-s"><h2>💳 Lista e Shpenzimeve</h2><p id="ph-s-p"></p></div>
+  <div style="display:flex;gap:6px;margin-bottom:11px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;gap:5px;flex-wrap:wrap;flex:1">
+      <button class="fbtn act" onclick="setFilter('te_gjitha',this)">Të gjitha</button>
+      <button class="fbtn" onclick="setFilter('ushqim',this)">🛒</button>
+      <button class="fbtn" onclick="setFilter('transport',this)">🚗</button>
+      <button class="fbtn" onclick="setFilter('shtepi',this)">🏠</button>
+      <button class="fbtn" onclick="setFilter('shendeti',this)">💊</button>
+      <button class="fbtn" onclick="setFilter('argetime',this)">🎮</button>
+    </div>
+    <button class="btn btnp btnsm" onclick="openAdd()">+ Shto</button>
+    <button class="btn btnsm" onclick="printPg('shpenzimet')" style="border-color:var(--g1);color:var(--g1)">🖨️ PDF</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table><thead><tr><th>Data</th><th>Përshkrim</th><th class="hmob">Kategoria</th><th class="hmob">Anëtari</th><th>Shuma</th><th></th></tr></thead>
+    <tbody id="tx-tb"></tbody></table>
+  </div>
+</div>
+
+<!-- BUXHETI -->
+<div class="pg" id="pg-buxheti">
+  <div class="phead" id="ph-b"><h2>🎯 Buxheti Mujor</h2><p id="ph-b-p"></p></div>
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+    <div class="ptit" style="margin:0">🎯 Buxheti</div>
+    <button class="btn btnsm" onclick="printPg('buxheti')" style="margin-left:auto;border-color:var(--g1);color:var(--g1)">🖨️ PDF</button>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctit">Totali Mujor</div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+        <div style="flex:1"><div style="font-size:26px;font-weight:800;color:var(--g1)" id="b-tot">—</div><div style="font-size:12px;color:var(--t2)">limit mujor</div></div>
+        <button class="btn btnsm" id="b-edit-btn" onclick="editBudget()">✏️ Ndrysho</button>
+      </div>
+      <div class="pbar" style="height:9px"><div class="pfill" id="b-bar" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-top:6px">
+        <span>Shpenzuar: <strong id="b-spent">—</strong></span>
+        <span>Mbetur: <strong id="b-rem" style="color:var(--g1)">—</strong></span>
+      </div>
+    </div>
+    <div class="card"><div class="ctit">⚠️ Paralajmërime</div><div id="b-alerts"></div></div>
+  </div>
+  <div class="card">
+    <div class="ctit">Limitet <button class="btn btnsm" id="b-mod-btn" onclick="openBux()">✏️ Modifiko</button></div>
+    <div id="b-cats"></div>
+  </div>
+</div>
+
+<!-- RAPORTET -->
+<div class="pg" id="pg-raportet">
+  <div class="phead" id="ph-r"><h2>📈 Raportet</h2><p id="ph-r-p"></p></div>
+  <div class="card" style="margin-bottom:12px;padding:11px 14px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;align-items:center;gap:6px">
+        <label style="font-size:12px;font-weight:600;color:var(--t2)">👤</label>
+        <select class="fi" id="r-mem" style="width:120px;padding:6px 10px" onchange="renderRep()"><option value="all">Të gjithë</option></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <label style="font-size:12px;font-weight:600;color:var(--t2)">📅</label>
+        <select class="fi" id="r-per" style="width:130px;padding:6px 10px" onchange="renderRep()">
+          <option value="mujor">Ky Muaj</option>
+          <option value="javor">Kjo Javë</option>
+          <option value="ditor">Sot</option>
+          <option value="vjetor">Ky Vit</option>
+          <option value="custom">Intervalë e lirë</option>
+        </select>
+      </div>
+      <div id="r-crng" style="display:none;gap:6px;align-items:center;flex-wrap:wrap">
+        <input class="fi" id="r-from" type="date" style="width:130px;padding:6px 9px" onchange="renderRep()">
+        <span style="color:var(--t2)">—</span>
+        <input class="fi" id="r-to" type="date" style="width:130px;padding:6px 9px" onchange="renderRep()">
+      </div>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="btn btnsm btnp" onclick="expRptXLS()">📊 XLS</button>
+        <button class="btn btnsm" onclick="printRpt()" style="border-color:var(--g1);color:var(--g1)">🖨️ PDF</button>
+      </div>
+    </div>
+  </div>
+  <div class="g4" id="r-kpis"></div>
+  <div class="tabs">
+    <button class="tab act" onclick="rTab('rt-ov',this)">📊 Përmbledhje</button>
+    <button class="tab" onclick="rTab('rt-mem',this)">👥 Anëtarët</button>
+    <button class="tab" onclick="rTab('rt-cat',this)">🗂️ Kategoritë</button>
+    <button class="tab" onclick="rTab('rt-det',this)">📋 Detaje</button>
+  </div>
+  <div id="rt-ov">
+    <div class="g2">
+      <div class="card"><div class="ctit">Sipas Kategorisë</div>
+        <div class="donut-wrap">
+          <svg width="130" height="130" viewBox="0 0 150 150" id="r-donut" style="flex-shrink:0"><circle cx="75" cy="75" r="55" fill="none" stroke="#dde8e2" stroke-width="22"/></svg>
+          <div id="r-dleg" style="flex:1;min-width:140px"></div>
+        </div>
+      </div>
+      <div class="card"><div class="ctit">Sipas Anëtarit</div><div id="r-membar" class="bars"></div></div>
+    </div>
+    <div class="card"><div class="ctit">Ditore</div><div id="r-daily" class="bars"></div></div>
+  </div>
+  <div id="rt-mem" style="display:none"><div id="r-mcards"></div></div>
+  <div id="rt-cat" style="display:none"><div id="r-ccards"></div></div>
+  <div id="rt-det" style="display:none">
+    <div class="card" style="padding:0;overflow:hidden">
+      <table><thead><tr><th>Data</th><th>Përshkrim</th><th class="hmob">Kategoria</th><th class="hmob">Anëtari</th><th>Shuma</th></tr></thead>
+      <tbody id="r-dtb"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- KATEGORITË (admin only) -->
+<div class="pg" id="pg-kategorite">
+  <div class="ptit">🗂️ Kategoritë</div>
+  <div class="g2">
+    <div class="card"><div class="ctit">Aktive</div><div id="cat-list"></div></div>
+    <div class="card">
+      <div class="ctit">Shto Kategori</div>
+      <div class="fg"><label class="fl">Emri</label><input class="fi" id="nc-name" placeholder="p.sh. Kafeneja..."></div>
+      <div class="fg"><label class="fl">Ikona</label>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <span class="ico-opt" onclick="selIco(this,'🍕')">🍕</span><span class="ico-opt" onclick="selIco(this,'☕')">☕</span>
+          <span class="ico-opt" onclick="selIco(this,'✈️')">✈️</span><span class="ico-opt" onclick="selIco(this,'🎵')">🎵</span>
+          <span class="ico-opt" onclick="selIco(this,'📱')">📱</span><span class="ico-opt" onclick="selIco(this,'🐶')">🐶</span>
+          <span class="ico-opt" onclick="selIco(this,'⚡')">⚡</span><span class="ico-opt" onclick="selIco(this,'🏋️')">🏋️</span>
+        </div><input type="hidden" id="nc-icon" value="🏷️">
+      </div>
+      <div class="fg"><label class="fl">Ngjyra</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <span class="col-opt" onclick="selCol(this,'#fef9c3','#854d0e')" style="background:#fef9c3"></span>
+          <span class="col-opt" onclick="selCol(this,'#dbeafe','#1e40af')" style="background:#dbeafe"></span>
+          <span class="col-opt" onclick="selCol(this,'#dcfce7','#166534')" style="background:#dcfce7"></span>
+          <span class="col-opt" onclick="selCol(this,'#fce7f3','#9d174d')" style="background:#fce7f3"></span>
+          <span class="col-opt" onclick="selCol(this,'#ede9fe','#5b21b6')" style="background:#ede9fe"></span>
+          <span class="col-opt" onclick="selCol(this,'#ffedd5','#9a3412')" style="background:#ffedd5"></span>
+          <span class="col-opt" onclick="selCol(this,'#e0f2fe','#0369a1')" style="background:#e0f2fe"></span>
+        </div>
+        <input type="hidden" id="nc-color" value="#f3f4f6">
+        <input type="hidden" id="nc-tc" value="#374151">
+      </div>
+      <button class="btn btnp" style="width:100%" onclick="addCat()">+ Shto Kategorinë</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANËTARËT (admin only) -->
+<div class="pg" id="pg-anetaret">
+  <div class="ptit">👥 Anëtarët</div>
+  <div class="g2">
+    <div><div id="mem-list"></div></div>
+    <div class="card">
+      <div class="ctit">Shto Anëtar</div>
+      <div class="fg"><label class="fl">Emri</label><input class="fi" id="nm-name" placeholder="Emri i plotë"></div>
+      <div class="fg"><label class="fl">Roli</label>
+        <select class="fi" id="nm-role">
+          <option>Prind</option><option>Fëmijë</option><option>Gjyshe/Gjysh</option><option>Tjetër</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Ngjyra Avatar</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="avcol" onclick="selAvc(this,'#2D6A4F')" style="background:#2D6A4F"></span>
+          <span class="avcol" onclick="selAvc(this,'#1e40af')" style="background:#1e40af"></span>
+          <span class="avcol" onclick="selAvc(this,'#9d174d')" style="background:#9d174d"></span>
+          <span class="avcol" onclick="selAvc(this,'#92400e')" style="background:#92400e"></span>
+          <span class="avcol" onclick="selAvc(this,'#5b21b6')" style="background:#5b21b6"></span>
+          <span class="avcol" onclick="selAvc(this,'#0e7490')" style="background:#0e7490"></span>
+          <span class="avcol" onclick="selAvc(this,'#b45309')" style="background:#b45309"></span>
+          <span class="avcol" onclick="selAvc(this,'#047857')" style="background:#047857"></span>
+        </div>
+        <input type="hidden" id="nm-color" value="#2D6A4F">
+      </div>
+      <button class="btn btnp" style="width:100%" onclick="addMember()">+ Shto Anëtarin</button>
+    </div>
+  </div>
+</div>
+
+<!-- EKSPORTO -->
+<div class="pg" id="pg-eksporto">
+  <div class="ptit">📁 Eksporto / Importo</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctit">📤 Eksporto</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <button class="btn btnp" onclick="expXLS()" style="justify-content:center;padding:10px">📊 Excel (.xls)</button>
+        <button class="btn" onclick="expCSV()" style="justify-content:center">📄 CSV</button>
+        <button class="btn" onclick="expJSON()" style="justify-content:center">🗃️ JSON</button>
+      </div>
+      <div style="border-top:1px solid var(--bd);padding-top:12px">
+        <div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">🖨️ Printo PDF:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+          <button class="btn btnsm" onclick="printPg('dashboard')" style="justify-content:center">Pasqyra</button>
+          <button class="btn btnsm" onclick="printPg('shpenzimet')" style="justify-content:center">Shpenzimet</button>
+          <button class="btn btnsm" onclick="printPg('buxheti')" style="justify-content:center">Buxheti</button>
+          <button class="btn btnsm" onclick="printRpt()" style="justify-content:center">Raportet</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="import-card">
+      <div class="ctit">📥 Importo CSV</div>
+      <div class="xlsa" onclick="document.getElementById('finp').click()">
+        <div style="font-size:34px;margin-bottom:7px">📂</div>
+        <div style="font-size:13px;color:var(--t2)">Kliko ose tërhiq skedarin CSV</div>
+      </div>
+      <input type="file" id="finp" style="display:none" accept=".csv" onchange="doImport(this)">
+      <div id="imp-res" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+</div></div></div><!-- cnt/main/app -->
+
+<!-- MODAL: SHTO -->
+<div class="mover" id="m-add">
+<div class="modal">
+  <div class="mtit"><span>➕ Shto Shpenzim</span><button class="xcbtn" onclick="closeAdd()">✕</button></div>
+  <div class="atabs">
+    <button class="atab act" id="at-s" onclick="setAddTab('s')">📝 I Thjeshtë</button>
+    <button class="atab" id="at-i" onclick="setAddTab('i')">🛒 Me Artikuj</button>
+  </div>
+  <div id="af-s">
+    <div class="fg"><label class="fl">Përshkrim *</label><input class="fi" id="a-desc" placeholder="p.sh. Blerje, Karburant..."></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label class="fl">Shuma (L) *</label><input class="fi" id="a-amt" type="number" min="1" placeholder="0"></div>
+      <div class="fg"><label class="fl">Data *</label><input class="fi" id="a-date" type="date"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label class="fl">Kategoria</label><select class="fi" id="a-cat"></select></div>
+      <div class="fg"><label class="fl">Anëtari *</label><select class="fi" id="a-mem"></select></div>
+    </div>
+    <div class="fg"><label class="fl">Shënime</label><input class="fi" id="a-notes" placeholder="Opsionale..."></div>
+  </div>
+  <div id="af-i" style="display:none">
+    <div class="fg"><label class="fl">Titulli *</label><input class="fi" id="a-tit" placeholder="p.sh. Blerje javore Merkato..."></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label class="fl">Data *</label><input class="fi" id="a-idate" type="date"></div>
+      <div class="fg"><label class="fl">Anëtari *</label><select class="fi" id="a-imem"></select></div>
+    </div>
+    <div class="fg"><label class="fl">Kategoria</label><select class="fi" id="a-icat"></select></div>
+    <div class="add-art-box">
+      <div style="font-size:11px;font-weight:700;color:var(--g1);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">➕ Artikull</div>
+      <div style="display:grid;grid-template-columns:1fr 55px 75px auto;gap:8px;align-items:end">
+        <div><label class="fl">Emri</label><input class="fi" id="art-n" placeholder="Emri..."></div>
+        <div><label class="fl">Sasi</label><input class="fi" id="art-q" type="number" min="1" value="1"></div>
+        <div><label class="fl">Çmimi L</label><input class="fi" id="art-p" type="number" min="0" placeholder="0"></div>
+        <button class="btn btnp" onclick="addArt()" style="height:36px;align-self:end">+</button>
+      </div>
+    </div>
+    <div id="art-list"></div>
+    <div id="art-tot" style="display:none;justify-content:space-between;padding:8px 0;border-top:1px solid var(--bd);font-weight:700;font-size:14px">
+      <span>TOTAL:</span><span id="art-tv" class="gre">0 L</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:14px;padding-top:11px;border-top:1px solid var(--bd)">
+    <button class="btn" onclick="closeAdd()">Anulo</button>
+    <button class="btn btnp" id="a-save" onclick="saveTx()">💾 Ruaj</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: EDITO -->
+<div class="mover" id="m-edit">
+<div class="modal">
+  <div class="mtit"><span>✏️ Edito Shpenzimin</span><button class="xcbtn" onclick="closeEdit()">✕</button></div>
+  <input type="hidden" id="e-id">
+  <div class="fg"><label class="fl">Përshkrim *</label><input class="fi" id="e-desc"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="fg"><label class="fl">Shuma (L) *</label><input class="fi" id="e-amt" type="number" min="1"></div>
+    <div class="fg"><label class="fl">Data *</label><input class="fi" id="e-date" type="date"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="fg"><label class="fl">Kategoria</label><select class="fi" id="e-cat"></select></div>
+    <div class="fg"><label class="fl">Anëtari</label><select class="fi" id="e-mem"></select></div>
+  </div>
+  <div class="fg"><label class="fl">Shënime</label><input class="fi" id="e-notes"></div>
+  <div id="e-arts-wrap">
+    <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">Artikujt</div>
+    <div id="e-art-list"></div>
+    <div id="e-art-tot" style="display:none;justify-content:space-between;padding:7px 0;border-top:1px solid var(--bd);font-weight:700;font-size:13px;margin-bottom:8px">
+      <span>TOTAL:</span><span id="e-art-tv" class="gre">0 L</span>
+    </div>
+    <div class="add-art-box">
+      <div style="font-size:11px;font-weight:700;color:var(--g1);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">➕ Shto Artikull</div>
+      <div style="display:grid;grid-template-columns:1fr 55px 75px auto;gap:8px;align-items:end">
+        <div><label class="fl">Emri</label><input class="fi" id="ea-n" placeholder="Emri..."></div>
+        <div><label class="fl">Sasi</label><input class="fi" id="ea-q" type="number" min="1" value="1"></div>
+        <div><label class="fl">Çmimi L</label><input class="fi" id="ea-p" type="number" min="0" placeholder="0"></div>
+        <button class="btn btnp" onclick="addEditArt()" style="height:36px;align-self:end">+</button>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:14px;padding-top:11px;border-top:1px solid var(--bd)">
+    <button class="btn" onclick="closeEdit()">Anulo</button>
+    <button class="btn btnp" id="e-save" onclick="saveEdit()">💾 Ruaj</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: BUXHETI -->
+<div class="mover" id="m-bux">
+<div class="modal" style="width:460px">
+  <div class="mtit"><span>🎯 Buxheti</span><button class="xcbtn" onclick="closeBux()">✕</button></div>
+  <div class="fg"><label class="fl">Total Mujor (L)</label><input class="fi" id="bx-tot" type="number"></div>
+  <div style="font-size:11px;font-weight:700;color:var(--t2);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.5px">Sipas Kategorisë (L)</div>
+  <div id="bx-form"></div>
+  <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:12px">
+    <button class="btn" onclick="closeBux()">Anulo</button>
+    <button class="btn btnp" onclick="saveBux()">💾 Ruaj</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+var CFG = null;   // {url, adminPass, famPass}
+var SESSION = null; // {name, isAdmin}
+var URL_ = '';
+
+var DB = {
+  txs: [],
+  cats: [
+    {id:'ushqim',name:'Ushqim',icon:'🛒',color:'#fef9c3',tc:'#854d0e'},
+    {id:'transport',name:'Transport',icon:'🚗',color:'#dbeafe',tc:'#1e40af'},
+    {id:'shtepi',name:'Shtëpi',icon:'🏠',color:'#dcfce7',tc:'#166534'},
+    {id:'shendeti',name:'Shëndet',icon:'💊',color:'#fce7f3',tc:'#9d174d'},
+    {id:'argetime',name:'Argëtim',icon:'🎮',color:'#ede9fe',tc:'#5b21b6'},
+    {id:'arsim',name:'Arsim',icon:'📚',color:'#ffedd5',tc:'#9a3412'},
+    {id:'veshje',name:'Veshje',icon:'👔',color:'#f1f5f9',tc:'#334155'},
+    {id:'tjera',name:'Të tjera',icon:'📦',color:'#f3f4f6',tc:'#374151'}
+  ],
+  mems: [],
+  budget: {total:60000, byCat:{ushqim:15000,transport:8000,shtepi:12000,shendeti:5000,argetime:6000,arsim:7000,veshje:4000,tjera:3000}},
+  period: 'mujor'
+};
+
+var CUR_FILTER = 'te_gjitha';
+var CUR_RTAB = 'rt-ov';
+var ADD_TAB = 's';
+var arts = [], editArts = [];
+var ico_v = '🏷️', col_v = '#f3f4f6', tc_v = '#374151', avc_v = '#2D6A4F';
+var RC = ['#2D6A4F','#1e40af','#9d174d','#5b21b6','#92400e','#0e7490','#b45309','#c05621'];
+
+// ══════════════════════════════════════════════
+// COPY CODE
+// ══════════════════════════════════════════════
+function copyCode() {
+  var t = document.getElementById('as-code').value.trim();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(t).then(function(){ alert('✅ Kodi u kopjua! Ngjite tani në Apps Script.'); });
+  } else {
+    var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    alert('✅ Kodi u kopjua!');
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.addEventListener('load', function() {
+  try { CFG = JSON.parse(localStorage.getItem('sf_cfg')||'null'); } catch(e){}
+  try { SESSION = JSON.parse(sessionStorage.getItem('sf_sess')||'null'); } catch(e){}
+
+  if (!CFG || !CFG.url) {
+    show('sc-setup'); return;
+  }
+  URL_ = CFG.url;
+  if (SESSION && SESSION.name) {
+    startApp();
+  } else {
+    show('sc-login');
+  }
+});
+
+function show(id) {
+  ['sc-setup','sc-login'].forEach(function(s){
+    var el=document.getElementById(s);
+    if(el) el.classList.toggle('gone', s!==id);
+  });
+}
+
+function showSetup() {
+  show('sc-setup');
+  document.getElementById('s-url').value = CFG&&CFG.url ? CFG.url : '';
+}
+
+// ══════════════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════════════
+async function doSetup() {
+  var url = document.getElementById('s-url').value.trim();
+  var apass = document.getElementById('s-apass').value.trim();
+  var fpass = document.getElementById('s-fpass').value.trim();
+  var errEl=document.getElementById('s-err'), okEl=document.getElementById('s-ok');
+  errEl.style.display='none'; okEl.style.display='none';
+
+  if (!url||!url.includes('script.google.com')) {
+    errEl.innerHTML='❌ URL i pavlefshëm!'; errEl.style.display='block'; return;
+  }
+  if (!apass) { errEl.innerHTML='❌ Vendos fjalëkalimin e adminit!'; errEl.style.display='block'; return; }
+  if (!fpass) { errEl.innerHTML='❌ Vendos fjalëkalimin familjar!'; errEl.style.display='block'; return; }
+  if (apass===fpass) { errEl.innerHTML='❌ Fjalëkalimet duhet të jenë të ndryshëm!'; errEl.style.display='block'; return; }
+
+  var btn=document.getElementById('s-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spin"></div> Duke u lidhur...';
+
+  try {
+    var r=await fetch(url+'?action=ping&t='+Date.now());
+    var d=await r.json();
+    if(!d.ok) throw new Error('bad');
+    CFG={url:url, adminPass:apass, famPass:fpass};
+    localStorage.setItem('sf_cfg', JSON.stringify(CFG));
+    URL_=url;
+    okEl.textContent='✅ U lidh! Tani mund të hysh.';
+    okEl.style.display='block';
+    setTimeout(function(){ show('sc-login'); }, 800);
+  } catch(e) {
+    errEl.innerHTML='❌ Nuk u lidh. Kontrollo URL-in dhe sigurohu që klikove <strong>Allow</strong> kur Google pyeti.';
+    errEl.style.display='block';
+  }
+  btn.disabled=false; btn.innerHTML='🚀 Konfiguro dhe Fillo!';
+}
+
+// ══════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════
+function switchLoginTab(t) {
+  document.getElementById('lt-fam').classList.toggle('act', t==='fam');
+  document.getElementById('lt-adm').classList.toggle('act', t==='adm');
+  document.getElementById('lf-fam').style.display = t==='fam'?'block':'none';
+  document.getElementById('lf-adm').style.display = t==='adm'?'block':'none';
+  document.getElementById('l-err').style.display='none';
+}
+
+function doLogin() {
+  var name=document.getElementById('l-name').value.trim();
+  var pass=document.getElementById('l-fpass').value;
+  var errEl=document.getElementById('l-err');
+  if (!name) { errEl.textContent='❌ Shkruaj emrin tënd!'; errEl.style.display='block'; return; }
+  if (!pass) { errEl.textContent='❌ Shkruaj fjalëkalimin!'; errEl.style.display='block'; return; }
+  if (pass !== CFG.famPass) { errEl.textContent='❌ Fjalëkalim i gabuar!'; errEl.style.display='block'; return; }
+  SESSION={name:name, isAdmin:false};
+  sessionStorage.setItem('sf_sess', JSON.stringify(SESSION));
+  startApp();
+}
+
+function doAdminLogin() {
+  var name=document.getElementById('l-aname').value.trim();
+  var pass=document.getElementById('l-apass').value;
+  var errEl=document.getElementById('l-err');
+  if (!name) { errEl.textContent='❌ Shkruaj emrin!'; errEl.style.display='block'; return; }
+  if (!pass) { errEl.textContent='❌ Shkruaj fjalëkalimin!'; errEl.style.display='block'; return; }
+  if (pass !== CFG.adminPass) { errEl.textContent='❌ Fjalëkalim i adminit i gabuar!'; errEl.style.display='block'; return; }
+  SESSION={name:name, isAdmin:true};
+  sessionStorage.setItem('sf_sess', JSON.stringify(SESSION));
+  startApp();
+}
+
+function doLogout() {
+  if(!confirm('Dëshiron të dilësh?')) return;
+  sessionStorage.removeItem('sf_sess');
+  SESSION=null;
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('app').style.display='none';
+  show('sc-login');
+  document.getElementById('l-name').value='';
+  document.getElementById('l-fpass').value='';
+  document.getElementById('l-aname').value='';
+  document.getElementById('l-apass').value='';
+  document.getElementById('l-err').style.display='none';
+  switchLoginTab('fam');
+}
+
+// ══════════════════════════════════════════════
+// APP START
+// ══════════════════════════════════════════════
+function startApp() {
+  document.getElementById('sc-setup').classList.add('gone');
+  document.getElementById('sc-login').classList.add('gone');
+  var appEl=document.getElementById('app');
+  appEl.style.display='grid';
+  appEl.classList.add('show');
+
+  // Set user display
+  document.getElementById('ulbl').textContent=SESSION.name;
+
+  // Admin UI
+  var isAdmin=SESSION.isAdmin;
+  document.getElementById('adm-badge').style.display=isAdmin?'inline-flex':'none';
+  document.getElementById('ni-kat').classList.toggle('adm-only', true);
+  document.getElementById('ni-kat').classList.toggle('visible', isAdmin);
+  document.getElementById('ni-mem').classList.toggle('adm-only', true);
+  document.getElementById('ni-mem').classList.toggle('visible', isAdmin);
+  document.getElementById('b-edit-btn').style.display=isAdmin?'':'none';
+  document.getElementById('b-mod-btn').style.display=isAdmin?'':'none';
+  document.getElementById('import-card').style.display=isAdmin?'':'none';
+
+  if(window.innerWidth<=680) document.getElementById('mps').style.display='flex';
+
+  loadAll(false);
+  setInterval(function(){ loadAll(false); }, 30000);
+  renderPg('dashboard');
+}
+
+// ══════════════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════════════
+function setSt(s) {
+  var d=document.getElementById('sdot'),t=document.getElementById('stxt');
+  if(!d)return;
+  d.className='sdot'+(s==='busy'?' busy':s==='err'?' err':'');
+  t.textContent=s==='busy'?'Duke ruajtur...':s==='err'?'Gabim':'Live';
+}
+
+async function loadAll(showMsg) {
+  if(!URL_) return;
+  setSt('busy');
+  try {
+    var r=await fetch(URL_+'?action=read&t='+Date.now());
+    var d=await r.json();
+    if(!d.ok) throw new Error('bad');
+
+    if(d.tx) {
+      DB.txs=d.tx.map(function(t){
+        var items=[];
+        try{items=typeof t.items==='string'?JSON.parse(t.items||'[]'):(t.items||[]);}catch(e){}
+        return{id:String(t.id||''),desc:String(t.desc||''),amount:parseFloat(t.amount)||0,
+          cat:String(t.cat||'tjera'),member:String(t.member||'—'),
+          date:String(t.date||'').slice(0,10),notes:String(t.notes||''),items:items};
+      }).filter(function(t){return t.id&&t.date;})
+        .sort(function(a,b){return b.date.localeCompare(a.date);});
+    }
+    if(d.mem&&d.mem.length) {
+      DB.mems=d.mem.map(function(m){
+        return{id:String(m.id||''),name:String(m.name||''),role:String(m.role||'Anëtar'),color:String(m.color||'#2D6A4F')};
+      });
+    }
+    if(d.cat&&d.cat.length) {
+      DB.cats=d.cat.map(function(c){
+        return{id:String(c.id||''),name:String(c.name||''),icon:String(c.icon||'📦'),color:String(c.color||'#f3f4f6'),tc:String(c.tc||'#374151')};
+      });
+    }
+    if(d.cfg&&d.cfg.budget) DB.budget=d.cfg.budget;
+
+    setSt('ok');
+    if(showMsg) toast('✅ Të dhënat u rifreskuan!','ok');
+
+    var pg=document.querySelector('.pg.act');
+    if(pg) renderPg(pg.id.replace('pg-',''));
+    populateRepMems();
+  } catch(e) {
+    setSt('err');
+    if(showMsg) toast('⚠️ Nuk u lidh me Sheets.','err');
+  }
+}
+
+async function post(body) {
+  if(!URL_) return{ok:false};
+  setSt('busy');
+  try{
+    var r=await fetch(URL_,{method:'POST',body:JSON.stringify(body)});
+    var d=await r.json();
+    setSt(d.ok?'ok':'err');
+    return d;
+  }catch(e){setSt('err');return{ok:false};}
+}
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function fmt(n){return Math.round(n).toLocaleString('sq-AL')+' L';}
+function fS(n){return n>=1000?Math.round(n/1000)+'k L':Math.round(n)+' L';}
+function today(){return new Date().toISOString().slice(0,10);}
+function monthStart(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';}
+function weekStart(){var d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7));return d.toISOString().slice(0,10);}
+function yearStart(){return new Date().getFullYear()+'-01-01';}
+function ini(n){return(n||'?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2)||'?';}
+function nowStr(){var d=new Date();return d.toLocaleDateString('sq-AL',{day:'2-digit',month:'long',year:'numeric'})+' — '+d.toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'});}
+function pLabel(){var p=DB.period,d=new Date();if(p==='ditor')return 'Sot — '+today();if(p==='javor')return 'Kjo Javë';if(p==='mujor')return d.toLocaleString('sq-AL',{month:'long',year:'numeric'});return 'Viti '+d.getFullYear();}
+function getCat(id){return DB.cats.find(function(c){return c.id===id;})||{name:String(id||'—'),icon:'📦',color:'#f3f4f6',tc:'#374151'};}
+function getMem(n){
+  if(!n&&n!==0)return{name:'—',color:'#8fa899',role:'—'};
+  var f=DB.mems.find(function(m){return m.name===String(n)||m.id===String(n);});
+  if(f)return f;
+  var colors=['#2D6A4F','#1e40af','#9d174d','#5b21b6','#92400e','#0e7490'];
+  var h=String(n).split('').reduce(function(a,c){return a+c.charCodeAt(0);},0);
+  return{name:String(n),color:colors[h%colors.length],role:'Anëtar'};
+}
+function periodTxs(){
+  var p=DB.period,all=DB.txs;
+  if(p==='ditor')return all.filter(function(t){return t.date===today();});
+  if(p==='javor')return all.filter(function(t){return t.date>=weekStart();});
+  if(p==='mujor')return all.filter(function(t){return t.date>=monthStart();});
+  if(p==='vjetor')return all.filter(function(t){return t.date>=yearStart();});
+  return all;
+}
+function daysIn(){var p=DB.period;if(p==='ditor')return 1;if(p==='javor')return 7;if(p==='mujor')return new Date().getDate();return Math.max(1,Math.ceil((new Date()-new Date(yearStart()))/86400000));}
+function empty(msg){return'<div style="color:var(--t3);font-size:13px;text-align:center;padding:14px 0">'+msg+'</div>';}
+function toast(msg,type,dur){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},dur||2500);}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function goTo(id) {
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('act');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('act');});
+  var pg=document.getElementById('pg-'+id);if(pg)pg.classList.add('act');
+  document.querySelectorAll('.ni').forEach(function(n){
+    var t=n.textContent.toLowerCase();
+    if((id==='dashboard'&&t.includes('pasqyr'))||(id==='shpenzimet'&&t.includes('shpenzim'))||
+       (id==='buxheti'&&t.includes('buxhet'))||(id==='raportet'&&t.includes('raport'))||
+       (id==='kategorite'&&t.includes('kategori'))||(id==='anetaret'&&t.includes('anëtar'))||
+       (id==='eksporto'&&t.includes('eksporto')))n.classList.add('act');
+  });
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('mob-ov').classList.remove('show');
+  renderPg(id);
+}
+function setPer(p,btn){
+  DB.period=p;
+  document.querySelectorAll('.pb,.mpb').forEach(function(b){b.classList.remove('act');});
+  document.querySelectorAll('.pb,.mpb').forEach(function(b){
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+p+"'"))b.classList.add('act');
+  });
+  var pg=document.querySelector('.pg.act');if(pg)renderPg(pg.id.replace('pg-',''));
+}
+function toggleSB(){document.getElementById('sb').classList.toggle('open');document.getElementById('mob-ov').classList.toggle('show');}
+function renderPg(id){
+  if(id==='dashboard')renderDash();
+  else if(id==='shpenzimet')renderTxs();
+  else if(id==='buxheti')renderBudget();
+  else if(id==='raportet')renderRep();
+  else if(id==='kategorite')renderCats();
+  else if(id==='anetaret')renderMems();
+}
+window.addEventListener('resize',function(){var m=document.getElementById('mps');if(m)m.style.display=window.innerWidth<=680?'flex':'none';});
+
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+function renderDash(){
+  var txs=periodTxs(),total=txs.reduce(function(s,t){return s+t.amount;},0);
+  var bud=DB.budget.total,rem=bud-total,d=daysIn();
+  document.getElementById('d-badge').textContent=pLabel();
+  document.getElementById('d-tot').textContent=fmt(total);
+  document.getElementById('d-bud').textContent=fmt(bud);
+  var re=document.getElementById('d-rem');re.textContent=fmt(Math.abs(rem));re.className='mv'+(rem>=0?' gre':' rd');
+  document.getElementById('d-rems').textContent=rem>=0?'mbetur':'⚠️ tejkalim!';
+  document.getElementById('d-avg').textContent=fmt(d>0?total/d:0);
+  document.getElementById('d-cnt').textContent=txs.length;
+  var byC={};txs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+  var sc=Object.entries(byC).sort(function(a,b){return b[1]-a[1];});
+  document.getElementById('d-cats').innerHTML=sc.length?sc.slice(0,7).map(function(e){
+    var c=getCat(e[0]),p=total>0?Math.round(e[1]/total*100):0;
+    return'<div class="crow"><div style="width:8px;height:8px;border-radius:2px;background:'+c.tc+';flex-shrink:0"></div>'+
+      '<span style="flex:1;font-size:13px">'+c.icon+' '+c.name+'</span>'+
+      '<span style="font-weight:700;font-size:13px">'+fmt(e[1])+'</span>'+
+      '<span style="font-size:11px;color:var(--t3);min-width:32px;text-align:right">'+p+'%</span></div>';
+  }).join(''):empty('Nuk ka shpenzime.');
+  document.getElementById('d-recent').innerHTML=txs.length?txs.slice(0,6).map(function(t){
+    var c=getCat(t.cat),m=getMem(t.member),hi=t.items&&t.items.length;
+    return'<div class="crow" style="gap:9px"><span style="font-size:17px">'+c.icon+'</span>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.desc+
+          (hi?'<span style="font-size:10px;background:#edf7f1;color:var(--g1);padding:1px 5px;border-radius:8px;margin-left:4px">'+t.items.length+' art.</span>':'')+'</div>'+
+        '<div style="font-size:11px;color:var(--t3)">'+t.date+' · '+m.name+'</div>'+
+      '</div><span class="red">-'+fmt(t.amount)+'</span></div>';
+  }).join(''):empty('Nuk ka shpenzime.');
+  var byM={};txs.forEach(function(t){byM[t.member]=(byM[t.member]||0)+t.amount;});
+  var mx=Math.max.apply(null,Object.values(byM).concat([1]));
+  document.getElementById('d-membar').innerHTML=Object.entries(byM).length?Object.entries(byM).map(function(e){
+    var m=getMem(e[0]),p=Math.round(e[1]/mx*100);
+    return'<div class="brow"><div class="blbl" style="display:flex;align-items:center;gap:5px;justify-content:flex-end">'+
+      '<div style="width:16px;height:16px;border-radius:50%;background:'+m.color+';flex-shrink:0"></div>'+m.name+'</div>'+
+      '<div class="btrk"><div class="bfil" style="width:'+p+'%;background:'+m.color+'">'+fS(e[1])+'</div></div>'+
+      '<div class="bval">'+fmt(e[1])+'</div></div>';
+  }).join(''):empty('Nuk ka të dhëna.');
+}
+
+// ══════════════════════════════════════════════
+// TRANSACTIONS
+// ══════════════════════════════════════════════
+function renderTxs(){
+  var txs=periodTxs();
+  if(CUR_FILTER!=='te_gjitha')txs=txs.filter(function(t){return t.cat===CUR_FILTER;});
+  var tb=document.getElementById('tx-tb');
+  if(!txs.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t3)">Nuk ka shpenzime.</td></tr>';return;}
+  tb.innerHTML=txs.map(function(t){
+    var c=getCat(t.cat),m=getMem(t.member),hi=t.items&&t.items.length;
+    var artH=hi?'<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">'+t.items.map(function(a){
+      return'<span style="font-size:10px;background:#edf7f1;border:1px solid #86efac;border-radius:5px;padding:1px 5px;color:var(--g1)">'+a.name+' ×'+a.qty+'</span>';
+    }).join('')+'</div>':'';
+    // Can edit own txs; admin can edit all
+    var canEdit=SESSION&&(SESSION.isAdmin||t.member===SESSION.name);
+    var tid=String(t.id);
+    return'<tr>'+
+      '<td style="color:var(--t2);font-size:12px;white-space:nowrap">'+t.date+'</td>'+
+      '<td><div style="font-weight:600">'+t.desc+'</div>'+(t.notes?'<div style="font-size:11px;color:var(--t3)">'+t.notes+'</div>':'')+artH+'</td>'+
+      '<td class="hmob"><span class="badge" style="background:'+c.color+';color:'+c.tc+'">'+c.icon+' '+c.name+'</span></td>'+
+      '<td class="hmob"><div style="display:flex;align-items:center;gap:6px">'+
+        '<div style="width:22px;height:22px;border-radius:50%;background:'+m.color+';display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:800">'+ini(m.name)+'</div>'+
+        m.name+'</div></td>'+
+      '<td class="red" style="white-space:nowrap">-'+fmt(t.amount)+'</td>'+
+      '<td style="white-space:nowrap">'+(canEdit?
+        '<button class="btn btnxs" onclick="openEdit(\''+tid+'\')" style="margin-right:3px">✏️</button>'+
+        '<button class="btn btnxs btnd" onclick="delTx(\''+tid+'\')">✕</button>':
+        '<span style="font-size:10px;color:var(--t3)">—</span>')+'</td></tr>';
+  }).join('');
+}
+function setFilter(f,btn){CUR_FILTER=f;document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('act');});btn.classList.add('act');renderTxs();}
+
+// ══════════════════════════════════════════════
+// BUDGET
+// ══════════════════════════════════════════════
+function renderBudget(){
+  var txs=periodTxs(),total=txs.reduce(function(s,t){return s+t.amount;},0);
+  var bud=DB.budget.total,rem=bud-total,pct=Math.min(100,Math.round(total/bud*100));
+  document.getElementById('b-tot').textContent=fmt(bud);
+  document.getElementById('b-spent').textContent=fmt(total);
+  document.getElementById('b-rem').textContent=fmt(rem);
+  var bar=document.getElementById('b-bar');bar.style.width=pct+'%';
+  bar.className='pfill'+(pct>90?' danger':pct>70?' warn':'');
+  var byC={};txs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+  var alerts='';
+  Object.entries(DB.budget.byCat||{}).forEach(function(e){
+    var c=getCat(e[0]),sp=byC[e[0]]||0,p=sp/e[1]*100;
+    if(p>80)alerts+='<div class="al '+(p>=100?'e':'w')+'"><span>'+c.icon+'</span>'+
+      '<div><strong>'+c.name+'</strong>: '+Math.round(p)+'%'+(p>=100?' — TEJKALIM!':'')+'</div></div>';
+  });
+  document.getElementById('b-alerts').innerHTML=alerts||'<div style="color:var(--t3);font-size:13px;padding:5px 0">✅ Të gjitha brenda limitit.</div>';
+  document.getElementById('b-cats').innerHTML=Object.entries(DB.budget.byCat||{}).map(function(e){
+    var c=getCat(e[0]),sp=byC[e[0]]||0,p=Math.min(100,Math.round(sp/e[1]*100));
+    return'<div style="display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--bd)">'+
+      '<span style="font-size:18px">'+c.icon+'</span>'+
+      '<div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:4px">'+
+        '<span style="font-size:13px;font-weight:600">'+c.name+'</span>'+
+        '<div><span style="font-weight:700">'+fmt(sp)+'</span> <span style="font-size:11px;color:var(--t3)">/ '+fmt(e[1])+'</span></div>'+
+      '</div><div class="pbar"><div class="pfill'+(p>90?' danger':p>70?' warn':'')+'" style="width:'+p+'%"></div></div></div>'+
+      '<span style="font-size:12px;color:var(--t2);min-width:34px;text-align:right;font-weight:600">'+p+'%</span></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// REPORTS
+// ══════════════════════════════════════════════
+function populateRepMems(){
+  var ms=document.getElementById('r-mem');if(!ms)return;
+  var cur=ms.value;while(ms.options.length>1)ms.remove(1);
+  var seen={};
+  DB.mems.forEach(function(m){var o=document.createElement('option');o.value=m.name;o.textContent=m.name;ms.appendChild(o);seen[m.name]=1;});
+  DB.txs.forEach(function(t){if(t.member&&t.member!=='—'&&!seen[t.member]){var o=document.createElement('option');o.value=t.member;o.textContent=t.member;ms.appendChild(o);seen[t.member]=1;}});
+  if(cur)ms.value=cur;
+}
+function getRepTxs(){
+  var ms=document.getElementById('r-mem'),ps=document.getElementById('r-per');
+  if(!ms||!ps)return DB.txs.slice();
+  var mem=ms.value,per=ps.value,txs=DB.txs.slice();
+  if(per==='ditor')txs=txs.filter(function(t){return t.date===today();});
+  else if(per==='javor')txs=txs.filter(function(t){return t.date>=weekStart();});
+  else if(per==='mujor')txs=txs.filter(function(t){return t.date>=monthStart();});
+  else if(per==='vjetor')txs=txs.filter(function(t){return t.date>=yearStart();});
+  else if(per==='custom'){var df=document.getElementById('r-from').value,dt=document.getElementById('r-to').value;if(df)txs=txs.filter(function(t){return t.date>=df;});if(dt)txs=txs.filter(function(t){return t.date<=dt;});}
+  if(mem!=='all')txs=txs.filter(function(t){return t.member===mem;});
+  return txs;
+}
+function renderRep(){
+  populateRepMems();
+  var ps=document.getElementById('r-per'),cr=document.getElementById('r-crng');
+  if(ps&&cr)cr.style.display=ps.value==='custom'?'flex':'none';
+  var txs=getRepTxs(),total=txs.reduce(function(s,t){return s+t.amount;},0),cnt=txs.length;
+  var avg=cnt>0?total/cnt:0,topC='—',topCA=0;
+  var byC={};txs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+  Object.entries(byC).forEach(function(e){if(e[1]>topCA){topCA=e[1];topC=getCat(e[0]).icon+' '+getCat(e[0]).name;}});
+  var mems={};txs.forEach(function(t){mems[t.member]=1;});
+  document.getElementById('r-kpis').innerHTML=
+    '<div class="met gr"><div class="ml">Total</div><div class="mv">'+fmt(total)+'</div><div class="ms">'+cnt+' tx</div></div>'+
+    '<div class="met or"><div class="ml">Mesatare / Tx</div><div class="mv" style="color:#b96a1f">'+fmt(avg)+'</div></div>'+
+    '<div class="met"><div class="ml">Kategoria Kryesore</div><div class="mv" style="font-size:14px">'+topC+'</div><div class="ms">'+fmt(topCA)+'</div></div>'+
+    '<div class="met"><div class="ml">Anëtarë Aktivë</div><div class="mv" style="color:var(--si)">'+Object.keys(mems).length+'</div></div>';
+  renderRTabContent();
+}
+function rTab(id,btn){
+  CUR_RTAB=id;
+  document.querySelectorAll('#pg-raportet .tab').forEach(function(t){t.classList.remove('act');});
+  btn.classList.add('act');
+  ['rt-ov','rt-mem','rt-cat','rt-det'].forEach(function(t){var el=document.getElementById(t);if(el)el.style.display=t===id?'block':'none';});
+  renderRTabContent();
+}
+function renderRTabContent(){
+  if(CUR_RTAB==='rt-ov')renderROv();
+  else if(CUR_RTAB==='rt-mem')renderRMem();
+  else if(CUR_RTAB==='rt-cat')renderRCat();
+  else if(CUR_RTAB==='rt-det')renderRDet();
+}
+function renderROv(){
+  var txs=getRepTxs(),total=txs.reduce(function(s,t){return s+t.amount;},0)||1;
+  var byC={};txs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+  var cats=Object.entries(byC).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
+  var r=55,circ=2*Math.PI*r,off=0,paths='<circle cx="75" cy="75" r="55" fill="none" stroke="#dde8e2" stroke-width="22"/>',leg='';
+  cats.forEach(function(e,i){var l=e[1]/total*circ;paths+='<circle cx="75" cy="75" r="55" fill="none" stroke="'+RC[i]+'" stroke-width="22" stroke-dasharray="'+l+' '+(circ-l)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 75 75)"/>';off+=l;var c=getCat(e[0]);leg+='<div class="leg-item"><div class="leg-dot" style="background:'+RC[i]+'"></div><span style="flex:1;color:var(--t2)">'+c.icon+' '+c.name+'</span><span style="font-weight:700">'+fmt(e[1])+'</span></div>';});
+  document.getElementById('r-donut').innerHTML=cats.length?paths:'<circle cx="75" cy="75" r="55" fill="none" stroke="#dde8e2" stroke-width="22"/>';
+  document.getElementById('r-dleg').innerHTML=leg||empty('Nuk ka të dhëna.');
+  var byM={};txs.forEach(function(t){byM[t.member]=(byM[t.member]||0)+t.amount;});
+  var mx=Math.max.apply(null,Object.values(byM).concat([1]));
+  document.getElementById('r-membar').innerHTML=Object.entries(byM).length?Object.entries(byM).map(function(e){
+    var m=getMem(e[0]),p=Math.round(e[1]/mx*100),pct=Math.round(e[1]/total*100);
+    return'<div class="brow"><div class="blbl" style="display:flex;align-items:center;gap:5px;justify-content:flex-end"><div style="width:16px;height:16px;border-radius:50%;background:'+m.color+';flex-shrink:0"></div>'+m.name+'</div><div class="btrk"><div class="bfil" style="width:'+p+'%;background:'+m.color+'">'+fS(e[1])+'</div></div><div class="bval">'+pct+'%</div></div>';
+  }).join(''):empty('Nuk ka të dhëna.');
+  var byD={};txs.forEach(function(t){byD[t.date]=(byD[t.date]||0)+t.amount;});
+  var dd=Object.entries(byD).sort(function(a,b){return a[0].localeCompare(b[0]);});
+  var mxD=Math.max.apply(null,dd.map(function(d){return d[1];}).concat([1]));
+  document.getElementById('r-daily').innerHTML=dd.length?dd.map(function(d){var p=Math.round(d[1]/mxD*100);return'<div class="brow"><div class="blbl">'+d[0].slice(5)+'</div><div class="btrk"><div class="bfil" style="width:'+p+'%;background:var(--g2)">'+fS(d[1])+'</div></div><div class="bval">'+fmt(d[1])+'</div></div>';}).join(''):empty('Nuk ka të dhëna.');
+}
+function renderRMem(){
+  var txs=getRepTxs(),total=txs.reduce(function(s,t){return s+t.amount;},0)||1,html='';
+  var seen={};txs.forEach(function(t){if(t.member&&t.member!=='—')seen[t.member]=true;});
+  Object.keys(seen).forEach(function(mName){
+    var mtxs=txs.filter(function(t){return t.member===mName;});
+    if(!mtxs.length)return;
+    var m=getMem(mName),mT=mtxs.reduce(function(s,t){return s+t.amount;},0),pct=Math.round(mT/total*100);
+    var byC={};mtxs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+    var top=Object.entries(byC).sort(function(a,b){return b[1]-a[1];}).slice(0,4);
+    html+='<div class="card" style="margin-bottom:12px">'+
+      '<div style="display:flex;align-items:center;gap:13px;margin-bottom:13px;padding-bottom:11px;border-bottom:1px solid var(--bd)">'+
+        '<div class="uav" style="width:46px;height:46px;font-size:17px;background:'+m.color+'">'+ini(m.name)+'</div>'+
+        '<div style="flex:1"><div style="font-size:16px;font-weight:700">'+m.name+(SESSION&&m.name===SESSION.name?' <span style="font-size:10px;background:#edf7f1;color:var(--g1);padding:1px 6px;border-radius:8px">Ti</span>':'')+'</div>'+
+        '<div style="font-size:12px;color:var(--t2)">'+mtxs.length+' tx · mesatare '+fmt(mtxs.length?mT/mtxs.length:0)+'</div></div>'+
+        '<div style="text-align:right"><div style="font-size:22px;font-weight:800;color:'+m.color+'">'+fmt(mT)+'</div><div style="font-size:12px;color:var(--t2)">'+pct+'%</div></div>'+
+      '</div>'+
+      '<div style="margin-bottom:10px"><div class="pbar" style="height:8px"><div class="pfill" style="width:'+pct+'%;background:'+m.color+'"></div></div></div>'+
+      top.map(function(e,i){var c=getCat(e[0]),p=Math.round(e[1]/mT*100);return'<div class="crow"><div style="width:8px;height:8px;border-radius:2px;background:'+RC[i]+';flex-shrink:0"></div><span style="flex:1;font-size:13px">'+c.icon+' '+c.name+'</span><span style="font-weight:700;font-size:13px">'+fmt(e[1])+'</span><span style="font-size:11px;color:var(--t3);min-width:30px;text-align:right">'+p+'%</span></div>';}).join('')+
+    '</div>';
+  });
+  document.getElementById('r-mcards').innerHTML=html||empty('Nuk ka të dhëna.');
+}
+function renderRCat(){
+  var txs=getRepTxs(),total=txs.reduce(function(s,t){return s+t.amount;},0)||1,html='';
+  var byC={};txs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+  Object.entries(byC).sort(function(a,b){return b[1]-a[1];}).forEach(function(e){
+    var c=getCat(e[0]),cTxs=txs.filter(function(t){return t.cat===e[0];});
+    var pct=Math.round(e[1]/total*100);
+    var byM={};cTxs.forEach(function(t){byM[t.member]=(byM[t.member]||0)+t.amount;});
+    var mx=Math.max.apply(null,Object.values(byM).concat([1]));
+    html+='<div class="card" style="margin-bottom:12px">'+
+      '<div style="display:flex;align-items:center;gap:11px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">'+
+        '<div style="width:40px;height:40px;border-radius:9px;background:'+c.color+';display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">'+c.icon+'</div>'+
+        '<div style="flex:1"><div style="font-size:15px;font-weight:700">'+c.name+'</div><div style="font-size:12px;color:var(--t2)">'+cTxs.length+' tx</div></div>'+
+        '<div style="text-align:right"><div style="font-size:19px;font-weight:800;color:'+c.tc+'">'+fmt(e[1])+'</div><div style="font-size:12px;color:var(--t2)">'+pct+'%</div></div>'+
+      '</div>'+
+      '<div style="margin-bottom:9px"><div class="pbar" style="height:7px"><div style="height:100%;border-radius:3px;background:'+c.tc+';width:'+pct+'%"></div></div></div>'+
+      Object.entries(byM).map(function(me){var m=getMem(me[0]),p=Math.round(me[1]/mx*100);return'<div class="brow"><div class="blbl" style="display:flex;align-items:center;gap:4px;justify-content:flex-end"><div style="width:14px;height:14px;border-radius:50%;background:'+m.color+';flex-shrink:0"></div>'+m.name+'</div><div class="btrk"><div class="bfil" style="width:'+p+'%;background:'+m.color+'">'+fS(me[1])+'</div></div><div class="bval">'+fmt(me[1])+'</div></div>';}).join('')+
+    '</div>';
+  });
+  document.getElementById('r-ccards').innerHTML=html||empty('Nuk ka të dhëna.');
+}
+function renderRDet(){
+  var txs=getRepTxs(),tb=document.getElementById('r-dtb');
+  if(!txs.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--t3)">Nuk ka të dhëna.</td></tr>';return;}
+  var rt=0;
+  tb.innerHTML=txs.map(function(t){rt+=t.amount;var c=getCat(t.cat),m=getMem(t.member);
+    return'<tr><td style="color:var(--t2);font-size:12px;white-space:nowrap">'+t.date+'</td>'+
+      '<td><div style="font-weight:500">'+t.desc+'</div></td>'+
+      '<td class="hmob"><span class="badge" style="background:'+c.color+';color:'+c.tc+'">'+c.icon+' '+c.name+'</span></td>'+
+      '<td class="hmob"><div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:18px;border-radius:50%;background:'+m.color+';display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:800">'+ini(m.name)+'</div>'+m.name+'</div></td>'+
+      '<td class="red" style="white-space:nowrap">-'+fmt(t.amount)+'</td></tr>';
+  }).join('')+'<tr style="background:#f4faf6"><td colspan="4" style="font-weight:700;padding:9px 12px">TOTAL ('+txs.length+' tx)</td><td style="font-weight:800;color:var(--g1);padding:9px 12px">'+fmt(rt)+'</td></tr>';
+}
+
+// ══════════════════════════════════════════════
+// CATEGORIES (admin only)
+// ══════════════════════════════════════════════
+function renderCats(){
+  var txs=DB.txs.filter(function(t){return t.date>=monthStart();}),byC={};
+  txs.forEach(function(t){byC[t.cat]=(byC[t.cat]||0)+t.amount;});
+  document.getElementById('cat-list').innerHTML=DB.cats.map(function(c){
+    var s=byC[c.id]||0,isDefault=['ushqim','transport','shtepi','shendeti','argetime','arsim','veshje','tjera'].includes(c.id);
+    return'<div class="crow"><div style="width:8px;height:8px;border-radius:2px;background:'+c.tc+';flex-shrink:0"></div>'+
+      '<span style="font-size:17px">'+c.icon+'</span>'+
+      '<span style="flex:1;font-size:13px;margin-left:5px">'+c.name+'</span>'+
+      '<span style="font-size:13px;font-weight:700">'+fmt(s)+'</span>'+
+      (!isDefault?'<button class="btn btnxs btnd" onclick="delCat(\''+c.id+'\')" style="margin-left:7px">✕</button>':'')+'</div>';
+  }).join('');
+}
+function selIco(el,v){document.querySelectorAll('.ico-opt').forEach(function(s){s.classList.remove('sel');});el.classList.add('sel');ico_v=v;}
+function selCol(el,c,t){document.querySelectorAll('.col-opt').forEach(function(s){s.classList.remove('sel');});el.classList.add('sel');col_v=c;tc_v=t;}
+async function addCat(){
+  if(!SESSION||!SESSION.isAdmin){toast('❌ Vetëm admini mund të shtojë kategori!','err');return;}
+  var name=document.getElementById('nc-name').value.trim();
+  if(!name){alert('Shkruaj emrin!');return;}
+  var id='c'+Date.now();
+  DB.cats.push({id:id,name:name,icon:ico_v,color:col_v,tc:tc_v});
+  DB.budget.byCat[id]=0;
+  document.getElementById('nc-name').value='';
+  renderCats();
+  await post({action:'addCat',id:id,name:name,icon:ico_v,color:col_v,tc:tc_v});
+  toast('✅ Kategoria u shtua!','ok');
+}
+async function delCat(id){
+  if(!SESSION||!SESSION.isAdmin){toast('❌ Vetëm admini!','err');return;}
+  if(!confirm('Fshi kategorinë?'))return;
+  DB.cats=DB.cats.filter(function(c){return c.id!==id;});
+  delete DB.budget.byCat[id];
+  renderCats();
+  await post({action:'delCat',id:id});
+  toast('🗑️ Kategoria u fshi.','');
+}
+
+// ══════════════════════════════════════════════
+// MEMBERS (admin only)
+// ══════════════════════════════════════════════
+function renderMems(){
+  var txs=DB.txs.filter(function(t){return t.date>=monthStart();}),byM={};
+  txs.forEach(function(t){byM[t.member]=(byM[t.member]||0)+t.amount;});
+  if(!DB.mems.length){
+    document.getElementById('mem-list').innerHTML='<div class="card" style="padding:18px;text-align:center;color:var(--t3)">Nuk ka anëtarë. Shto me formën djathtas.</div>';
+    return;
+  }
+  document.getElementById('mem-list').innerHTML=DB.mems.map(function(m){
+    var s=byM[m.name]||0,cnt=txs.filter(function(t){return t.member===m.name;}).length;
+    var isMe=SESSION&&m.name===SESSION.name;
+    return'<div class="ucard"><div class="uav" style="background:'+m.color+'">'+ini(m.name)+'</div>'+
+      '<div style="flex:1"><div style="font-size:14px;font-weight:600">'+m.name+(isMe?' <span style="font-size:10px;background:#edf7f1;color:var(--g1);padding:1px 6px;border-radius:8px">Ti</span>':'')+'</div>'+
+      '<div style="font-size:11px;color:var(--t3)">'+m.role+'</div>'+
+      '<div style="font-size:12px;color:var(--t2);margin-top:2px">'+fmt(s)+' · '+cnt+' tx</div></div>'+
+      (!isMe?'<button class="btn btnxs btnd" onclick="delMem(\''+m.id+'\')">✕</button>':'')+
+    '</div>';
+  }).join('');
+}
+function selAvc(el,c){document.querySelectorAll('.avcol').forEach(function(s){s.classList.remove('sel');});el.classList.add('sel');avc_v=c;}
+async function addMember(){
+  if(!SESSION||!SESSION.isAdmin){toast('❌ Vetëm admini!','err');return;}
+  var name=document.getElementById('nm-name').value.trim();
+  if(!name){alert('Shkruaj emrin!');return;}
+  if(DB.mems.find(function(m){return m.name.toLowerCase()===name.toLowerCase();})){alert('Ky emër ekziston!');return;}
+  var id=String(Date.now());
+  DB.mems.push({id:id,name:name,role:document.getElementById('nm-role').value,color:avc_v});
+  document.getElementById('nm-name').value='';
+  renderMems();
+  await post({action:'addMember',id:id,name:name,role:document.getElementById('nm-role').value,color:avc_v});
+  toast('✅ Anëtari u shtua!','ok');
+}
+async function delMem(id){
+  if(!SESSION||!SESSION.isAdmin){toast('❌ Vetëm admini!','err');return;}
+  if(!confirm('Fshi anëtarin?'))return;
+  DB.mems=DB.mems.filter(function(m){return m.id!==id;});
+  renderMems();
+  await post({action:'delMember',id:id});
+  toast('🗑️ Anëtari u fshi.','');
+}
+
+// ══════════════════════════════════════════════
+// ADD TRANSACTION
+// ══════════════════════════════════════════════
+function buildCatOpts(){return DB.cats.map(function(c){return'<option value="'+c.id+'">'+c.icon+' '+c.name+'</option>';}).join('');}
+function buildMemOpts(){
+  var name=SESSION?SESSION.name:'';
+  var opts=DB.mems.map(function(m){return'<option value="'+m.name+'">'+m.name+'</option>';}).join('');
+  if(!opts&&name)opts='<option value="'+name+'">'+name+'</option>';
+  if(!opts)opts='<option value="Unë">Unë</option>';
+  return opts;
+}
+function openAdd(){
+  arts=[];
+  var cO=buildCatOpts(),mO=buildMemOpts();
+  ['a-cat','a-icat'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=cO;});
+  ['a-mem','a-imem'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.innerHTML=mO;
+    if(SESSION)el.value=SESSION.name;
+  });
+  var td=today();
+  ['a-date','a-idate'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=td;});
+  ['a-desc','a-notes','a-tit','art-n','art-p'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var aa=document.getElementById('a-amt');if(aa)aa.value='';
+  var aq=document.getElementById('art-q');if(aq)aq.value='1';
+  renderArts();setAddTab('s');
+  document.getElementById('m-add').classList.add('show');
+}
+function closeAdd(){document.getElementById('m-add').classList.remove('show');}
+function setAddTab(t){
+  ADD_TAB=t;
+  document.getElementById('af-s').style.display=t==='s'?'block':'none';
+  document.getElementById('af-i').style.display=t==='i'?'block':'none';
+  document.getElementById('at-s').classList.toggle('act',t==='s');
+  document.getElementById('at-i').classList.toggle('act',t==='i');
+}
+function addArt(){
+  var name=document.getElementById('art-n').value.trim();
+  var qty=parseInt(document.getElementById('art-q').value)||1;
+  var price=parseFloat(document.getElementById('art-p').value)||0;
+  if(!name){alert('Shkruaj emrin e artikullit!');return;}
+  arts.push({name:name,qty:qty,price:price});
+  document.getElementById('art-n').value='';document.getElementById('art-q').value='1';document.getElementById('art-p').value='';
+  document.getElementById('art-n').focus();renderArts();
+}
+function removeArt(i){arts.splice(i,1);renderArts();}
+function renderArts(){
+  var list=document.getElementById('art-list'),tot=document.getElementById('art-tot'),tv=document.getElementById('art-tv');
+  if(!arts.length){list.innerHTML=empty('Shto artikuj nga forma sipër.');tot.style.display='none';return;}
+  var sum=0;
+  list.innerHTML=arts.map(function(a,i){var sub=a.qty*a.price;sum+=sub;
+    return'<div class="art-row"><span style="flex:1;font-size:13px;font-weight:500">'+a.name+'</span>'+
+      '<span style="font-size:12px;color:var(--t2);min-width:38px;text-align:center">×'+a.qty+'</span>'+
+      '<span class="gre" style="min-width:68px;text-align:right">'+fmt(sub)+'</span>'+
+      '<button class="art-del" onclick="removeArt('+i+')">×</button></div>';
+  }).join('');
+  tot.style.display='flex';tv.textContent=fmt(sum);
+}
+async function saveTx(){
+  var btn=document.getElementById('a-save');btn.disabled=true;btn.innerHTML='<div class="spin"></div>';
+  try{
+    if(ADD_TAB==='s'){
+      var desc=document.getElementById('a-desc').value.trim();
+      var amt=parseFloat(document.getElementById('a-amt').value);
+      var date=document.getElementById('a-date').value;
+      var cat=document.getElementById('a-cat').value;
+      var mem=document.getElementById('a-mem').value;
+      var notes=document.getElementById('a-notes').value.trim();
+      if(!desc||!amt||!date||!mem){alert('Plotëso: Përshkrim, Shuma, Data dhe Anëtari!');return;}
+      var r=await post({action:'addTx',desc:desc,amount:amt,cat:cat,member:mem,date:date,notes:notes,items:[]});
+      if(!r.ok){toast('❌ Gabim gjatë ruajtjes.','err');return;}
+      DB.txs.unshift({id:r.id||String(Date.now()),desc:desc,amount:amt,cat:cat,member:mem,date:date,notes:notes,items:[]});
+    }else{
+      var tit=document.getElementById('a-tit').value.trim();
+      var date2=document.getElementById('a-idate').value;
+      var cat2=document.getElementById('a-icat').value;
+      var mem2=document.getElementById('a-imem').value;
+      if(!tit||!date2||!mem2){alert('Plotëso titullin, datën dhe anëtarin!');return;}
+      if(!arts.length){alert('Shto të paktën një artikull!');return;}
+      var tot2=arts.reduce(function(s,a){return s+a.qty*a.price;},0);
+      var r2=await post({action:'addTx',desc:tit,amount:tot2,cat:cat2,member:mem2,date:date2,notes:'',items:arts.slice()});
+      if(!r2.ok){toast('❌ Gabim gjatë ruajtjes.','err');return;}
+      DB.txs.unshift({id:r2.id||String(Date.now()),desc:tit,amount:tot2,cat:cat2,member:mem2,date:date2,notes:'',items:arts.slice()});
+    }
+    DB.txs.sort(function(a,b){return b.date.localeCompare(a.date);});
+    closeAdd();toast('✅ Shpenzimi u ruajt!','ok');
+    var pg=document.querySelector('.pg.act');if(pg)renderPg(pg.id.replace('pg-',''));
+  }finally{btn.disabled=false;btn.innerHTML='💾 Ruaj';}
+}
+async function delTx(id){
+  if(!confirm('Fshi këtë shpenzim?'))return;
+  DB.txs=DB.txs.filter(function(t){return String(t.id)!==String(id);});
+  var pg=document.querySelector('.pg.act');if(pg)renderPg(pg.id.replace('pg-',''));
+  var r=await post({action:'deleteTx',id:String(id)});
+  if(!r.ok)toast('⚠️ Nuk u fshi nga Sheets.','err');
+  else toast('🗑️ U fshi.','');
+}
+
+// ══════════════════════════════════════════════
+// EDIT
+// ══════════════════════════════════════════════
+function openEdit(id){
+  var t=DB.txs.find(function(x){return String(x.id)===String(id);});if(!t)return;
+  editArts=t.items?JSON.parse(JSON.stringify(t.items)):[];
+  var cO=buildCatOpts(),mO=buildMemOpts();
+  document.getElementById('e-cat').innerHTML=cO;
+  document.getElementById('e-mem').innerHTML=mO;
+  document.getElementById('e-id').value=id;
+  document.getElementById('e-desc').value=t.desc;
+  document.getElementById('e-amt').value=t.amount;
+  document.getElementById('e-date').value=t.date;
+  document.getElementById('e-cat').value=t.cat;
+  document.getElementById('e-mem').value=t.member;
+  document.getElementById('e-notes').value=t.notes||'';
+  document.getElementById('ea-n').value='';document.getElementById('ea-q').value='1';document.getElementById('ea-p').value='';
+  renderEditArts();
+  document.getElementById('m-edit').classList.add('show');
+}
+function closeEdit(){document.getElementById('m-edit').classList.remove('show');}
+function addEditArt(){
+  var name=document.getElementById('ea-n').value.trim();
+  var qty=parseInt(document.getElementById('ea-q').value)||1;
+  var price=parseFloat(document.getElementById('ea-p').value)||0;
+  if(!name){alert('Shkruaj emrin!');return;}
+  editArts.push({name:name,qty:qty,price:price});
+  document.getElementById('ea-n').value='';document.getElementById('ea-q').value='1';document.getElementById('ea-p').value='';
+  document.getElementById('ea-n').focus();renderEditArts();
+}
+function removeEditArt(i){editArts.splice(i,1);renderEditArts();}
+function renderEditArts(){
+  var list=document.getElementById('e-art-list'),tot=document.getElementById('e-art-tot'),tv=document.getElementById('e-art-tv');
+  if(!editArts.length){list.innerHTML=empty('Nuk ka artikuj.');tot.style.display='none';return;}
+  var sum=0;
+  list.innerHTML=editArts.map(function(a,i){var sub=a.qty*a.price;sum+=sub;
+    return'<div class="art-row"><span style="flex:1;font-size:13px;font-weight:500">'+a.name+'</span>'+
+      '<span style="font-size:12px;color:var(--t2);min-width:38px;text-align:center">×'+a.qty+'</span>'+
+      '<span class="gre" style="min-width:68px;text-align:right">'+fmt(sub)+'</span>'+
+      '<button class="art-del" onclick="removeEditArt('+i+')">×</button></div>';
+  }).join('');
+  tot.style.display='flex';tv.textContent=fmt(sum);
+  document.getElementById('e-amt').value=sum;
+}
+async function saveEdit(){
+  var id=document.getElementById('e-id').value;
+  var desc=document.getElementById('e-desc').value.trim();
+  var amt=parseFloat(document.getElementById('e-amt').value);
+  var date=document.getElementById('e-date').value;
+  var cat=document.getElementById('e-cat').value;
+  var mem=document.getElementById('e-mem').value;
+  var notes=document.getElementById('e-notes').value.trim();
+  if(!desc||!amt||!date){alert('Plotëso fushat e detyrueshme!');return;}
+  var finalAmt=editArts.length>0?editArts.reduce(function(s,a){return s+a.qty*a.price;},0):amt;
+  var btn=document.getElementById('e-save');btn.disabled=true;btn.innerHTML='<div class="spin"></div>';
+  try{
+    var idx=DB.txs.findIndex(function(t){return String(t.id)===String(id);});
+    if(idx>=0)DB.txs[idx]={id:id,desc:desc,amount:finalAmt,cat:cat,member:mem,date:date,notes:notes,items:editArts.slice()};
+    var r=await post({action:'updateTx',id:String(id),desc:desc,amount:finalAmt,cat:cat,member:mem,date:date,notes:notes,items:editArts.slice()});
+    if(!r.ok)toast('⚠️ Nuk u ruajt plotësisht.','err');
+    else{closeEdit();toast('✅ Ndryshimet u ruajtën!','ok');}
+    var pg=document.querySelector('.pg.act');if(pg)renderPg(pg.id.replace('pg-',''));
+  }finally{btn.disabled=false;btn.innerHTML='💾 Ruaj';}
+}
+
+// ══════════════════════════════════════════════
+// BUDGET (admin only)
+// ══════════════════════════════════════════════
+function openBux(){
+  if(!SESSION||!SESSION.isAdmin){toast('❌ Vetëm admini mund të ndryshojë buxhetin!','err');return;}
+  document.getElementById('bx-tot').value=DB.budget.total;
+  document.getElementById('bx-form').innerHTML=Object.entries(DB.budget.byCat||{}).map(function(e){
+    var c=getCat(e[0]);
+    return'<div class="fg"><label class="fl">'+c.icon+' '+c.name+' (L)</label><input class="fi" id="bx-'+e[0]+'" type="number" value="'+e[1]+'"></div>';
+  }).join('');
+  document.getElementById('m-bux').classList.add('show');
+}
+function closeBux(){document.getElementById('m-bux').classList.remove('show');}
+async function saveBux(){
+  var tv=parseFloat(document.getElementById('bx-tot').value);
+  if(!isNaN(tv))DB.budget.total=tv;
+  Object.keys(DB.budget.byCat||{}).forEach(function(c){var el=document.getElementById('bx-'+c);if(el)DB.budget.byCat[c]=parseFloat(el.value)||0;});
+  closeBux();renderBudget();
+  await post({action:'saveCfg',budget:DB.budget});
+  toast('✅ Buxheti u ruajt!','ok');
+}
+async function editBudget(){
+  if(!SESSION||!SESSION.isAdmin){toast('❌ Vetëm admini!','err');return;}
+  var v=prompt('Buxheti total mujor (L):',DB.budget.total);
+  if(!v||isNaN(v))return;
+  DB.budget.total=parseFloat(v);
+  renderBudget();
+  await post({action:'saveCfg',budget:DB.budget});
+  toast('✅ Buxheti u përditësua!','ok');
+}
+
+// ══════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════
+function dl(content,name,type){var blob=new Blob(['\ufeff'+content],{type:type});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+function expCSV(){dl('Data,Pershkrim,Kategoria,Anetari,Shuma,Shenime\n'+DB.txs.map(function(t){var c=getCat(t.cat);return[t.date,'"'+t.desc+'"',c.name,t.member,t.amount,'"'+(t.notes||'')+'"'].join(',');}).join('\n'),'shpenzimet.csv','text/csv;charset=utf-8');toast('✅ CSV u eksportua!','ok');}
+function expJSON(){dl(JSON.stringify({transactions:DB.txs,members:DB.mems,budget:DB.budget},null,2),'shpenzimet.json','application/json');toast('✅ JSON u eksportua!','ok');}
+function expXLS(){
+  var h=['Data','Pershkrim','Kategoria','Anetari','Shuma (L)','Shenime'];
+  var xml='<?xml version="1.0" encoding="UTF-8"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n<Worksheet ss:Name="Shpenzimet"><Table>\n';
+  xml+='<Row>'+h.map(function(h){return'<Cell><Data ss:Type="String">'+h+'</Data></Cell>';}).join('')+'</Row>\n';
+  DB.txs.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).forEach(function(t){
+    var c=getCat(t.cat),arts2=(t.items&&t.items.length)?t.items.map(function(a){return a.name+' x'+a.qty;}).join('; '):'';
+    xml+='<Row><Cell><Data ss:Type="String">'+t.date+'</Data></Cell><Cell><Data ss:Type="String">'+t.desc+'</Data></Cell><Cell><Data ss:Type="String">'+c.name+'</Data></Cell><Cell><Data ss:Type="String">'+t.member+'</Data></Cell><Cell><Data ss:Type="Number">'+t.amount+'</Data></Cell><Cell><Data ss:Type="String">'+(t.notes||'')+'</Data></Cell></Row>\n';
+  });
+  xml+='</Table></Worksheet></Workbook>';
+  dl(xml,'shpenzimet.xls','application/vnd.ms-excel');
+  toast('✅ Excel u eksportua!','ok');
+}
+function expRptXLS(){
+  var txs=getRepTxs();
+  var xml='<?xml version="1.0" encoding="UTF-8"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n<Worksheet ss:Name="Raport"><Table>\n';
+  xml+='<Row><Cell><Data ss:Type="String">Data</Data></Cell><Cell><Data ss:Type="String">Pershkrim</Data></Cell><Cell><Data ss:Type="String">Kategoria</Data></Cell><Cell><Data ss:Type="String">Anetari</Data></Cell><Cell><Data ss:Type="String">Shuma (L)</Data></Cell></Row>\n';
+  txs.forEach(function(t){var c=getCat(t.cat);xml+='<Row><Cell><Data ss:Type="String">'+t.date+'</Data></Cell><Cell><Data ss:Type="String">'+t.desc+'</Data></Cell><Cell><Data ss:Type="String">'+c.name+'</Data></Cell><Cell><Data ss:Type="String">'+t.member+'</Data></Cell><Cell><Data ss:Type="Number">'+t.amount+'</Data></Cell></Row>\n';});
+  var tot=txs.reduce(function(s,t){return s+t.amount;},0);
+  xml+='<Row><Cell><Data ss:Type="String">TOTAL</Data></Cell><Cell/><Cell/><Cell/><Cell><Data ss:Type="Number">'+tot+'</Data></Cell></Row>\n</Table></Worksheet></Workbook>';
+  dl(xml,'raport.xls','application/vnd.ms-excel');toast('✅ Raporti u eksportua!','ok');
+}
+function doImport(inp){
+  var f=inp.files[0];if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(e){importCSV(e.target.result);};
+  reader.readAsText(f,'UTF-8');inp.value='';
+}
+async function importCSV(text){
+  var lines=text.trim().split('\n');if(lines.length<2){toast('⚠️ Skedar i zbrazët.','err');return;}
+  var cnt=0,promises=[];
+  for(var i=1;i<lines.length;i++){
+    var p=lines[i].split(',');if(p.length<4)continue;
+    var dt=p[0].trim(),desc=p[1].replace(/"/g,'').trim(),catN=p[2].trim().toLowerCase(),amt=parseFloat(p[3].trim());
+    if(!dt||!desc||isNaN(amt))continue;
+    var c=DB.cats.find(function(c2){return c2.name.toLowerCase()===catN||c2.id===catN;})||{id:'tjera'};
+    var memN=p[4]?p[4].replace(/"/g,'').trim():(SESSION?SESSION.name:'');
+    var id=String(Date.now()+i);
+    DB.txs.push({id:id,desc:desc,amount:amt,cat:c.id,member:memN,date:dt,notes:'',items:[]});
+    promises.push(post({action:'addTx',id:id,desc:desc,amount:amt,cat:c.id,member:memN,date:dt,notes:'',items:[]}));
+    cnt++;
+  }
+  DB.txs.sort(function(a,b){return b.date.localeCompare(a.date);});
+  var res=document.getElementById('imp-res');
+  res.innerHTML='<div class="al s">✅ Duke ruajtur '+cnt+' transaksione...</div>';
+  await Promise.all(promises);
+  res.innerHTML='<div class="al s">✅ '+cnt+' transaksione u ruajtën!</div>';
+  var pg=document.querySelector('.pg.act');if(pg)renderPg(pg.id.replace('pg-',''));
+}
+
+// ══════════════════════════════════════════════
+// PRINT
+// ══════════════════════════════════════════════
+function printPg(pgId){
+  var php=document.getElementById('ph-'+pgId.charAt(0)+'-p');
+  if(php)php.textContent='Periudha: '+pLabel()+' · Gjeneruar: '+nowStr();
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('pnow');});
+  var pg=document.getElementById('pg-'+pgId);if(pg)pg.classList.add('pnow');
+  window.print();if(pg)pg.classList.remove('pnow');
+}
+function printRpt(){
+  renderROv();renderRMem();renderRCat();renderRDet();
+  var ms=document.getElementById('r-mem'),ps=document.getElementById('r-per');
+  var php=document.getElementById('ph-r-p');
+  if(php)php.textContent='Anëtari: '+(ms&&ms.value!=='all'?ms.options[ms.selectedIndex].text:'Të gjithë')+' · '+nowStr();
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('pnow');});
+  var pg=document.getElementById('pg-raportet');if(pg)pg.classList.add('pnow');
+  ['rt-ov','rt-mem','rt-cat','rt-det'].forEach(function(id){var el=document.getElementById(id);if(el){el.setAttribute('data-d',el.style.display);el.style.display='block';}});
+  window.print();
+  if(pg)pg.classList.remove('pnow');
+  ['rt-ov','rt-mem','rt-cat','rt-det'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=id===CUR_RTAB?'block':'none';});
+}
+
+// ══════════════════════════════════════════════
+// EVENTS
+// ══════════════════════════════════════════════
+['m-add','m-edit','m-bux'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el)el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    if(document.getElementById('m-add').classList.contains('show')&&ADD_TAB==='i'){
+      var f=document.activeElement;
+      if(f&&['art-n','art-q','art-p'].includes(f.id)){e.preventDefault();addArt();}
+    }
+    if(document.getElementById('m-edit').classList.contains('show')){
+      var f=document.activeElement;
+      if(f&&['ea-n','ea-q','ea-p'].includes(f.id)){e.preventDefault();addEditArt();}
+    }
+  }
+});
+</script>
+</body>
+</html>
